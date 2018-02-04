@@ -1,0 +1,71 @@
+class LEAExtras {
+    name: String
+    code: String
+    gathererCode: String
+    magicCardsInfoCode: String
+    releaseDate: Date
+    border: String
+    type: String
+    booster: List<Booster>
+    mkmName: String
+    mkmID: Int
+    cards: List<Card>
+}
+
+class Card {
+    artist: String
+    cmc: Int
+    id: String
+    imageName: String
+    layout: Layout
+    legalities: List<CardLegality>
+    manaCost?: String
+    mciNumber?: String
+    multiverseid: Int
+    name: String
+    originalText?: String
+    originalType: String
+    printings: List<String>
+    rarity: Rarity
+    rulings?: List<Ruling>
+    text?: String
+    type: String
+    types: List<Type>
+    reserved?: Bool
+    power?: String
+    subtypes?: List<String>
+    toughness?: String
+    colorIdentity?: List<ColorIdentity>
+    flavor?: String
+    colors?: List<Color>
+    supertypes?: List<Supertype>
+    variations?: List<Int>
+}
+
+class CardLegality {
+    format: Format
+    legality: LegalityLegality
+}
+
+class Ruling {
+    date: Date
+    text: String
+}
+
+enum Booster = Common | Rare | Uncommon
+
+enum ColorIdentity = B | G | R | U | W
+
+enum Color = Black | Blue | Green | Red | White
+
+enum Layout = Normal
+
+enum Format = AmonkhetBlock | BattleForZendikarBlock | Commander | IceAgeBlock | InnistradBlock | InvasionBlock | IxalanBlock | KaladeshBlock | KamigawaBlock | KhansOfTarkirBlock | Legacy | LorwynShadowmoorBlock | MasquesBlock | MirageBlock | MirrodinBlock | Modern | OdysseyBlock | OnslaughtBlock | RavnicaBlock | ReturnToRavnicaBlock | ScarsOfMirrodinBlock | ShadowsOverInnistradBlock | ShardsOfAlaraBlock | Standard | TempestBlock | TherosBlock | TimeSpiralBlock | UnSets | UrzaBlock | Vintage | ZendikarBlock
+
+enum LegalityLegality = Banned | Legal | Restricted
+
+enum Rarity = BasicLand | Common | Rare | Uncommon
+
+enum Supertype = Basic
+
+enum Type = Artifact | Creature | Enchantment | Instant | Land | Sorcery
