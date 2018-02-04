@@ -1,4 +1,4 @@
-# Typed Magic: The Gathering
+# Magic: The Gathering – Typed JSON API
 
 > MTG LEA Set + Extras
 
