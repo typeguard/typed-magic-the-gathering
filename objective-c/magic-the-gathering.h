@@ -1,7 +1,7 @@
 // To parse this JSON:
-//
+// 
 //   NSError *error;
-//   LEAExtras *extras = [LEAExtras fromJSON:json encoding:NSUTF8Encoding error:&error]
+//   LEAExtras *extras = [LEAExtras fromJSON:json encoding:NSUTF8Encoding error:&error];
 
 #import <Foundation/Foundation.h>
 
@@ -11,7 +11,7 @@
 @class LEAColorIdentity;
 @class LEAColor;
 @class LEALayout;
-@class LEACardLegality;
+@class LEALegalityElement;
 @class LEAFormat;
 @class LEALegalityLegality;
 @class LEARarity;
@@ -154,7 +154,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy)             NSString *identifier;
 @property (nonatomic, copy)             NSString *imageName;
 @property (nonatomic, assign)           LEALayout *layout;
-@property (nonatomic, copy)             NSArray<LEACardLegality *> *legalities;
+@property (nonatomic, copy)             NSArray<LEALegalityElement *> *legalities;
 @property (nonatomic, nullable, copy)   NSString *manaCost;
 @property (nonatomic, nullable, copy)   NSString *mciNumber;
 @property (nonatomic, assign)           NSInteger multiverseid;
@@ -178,7 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable, copy)   NSArray<NSNumber *> *variations;
 @end
 
-@interface LEACardLegality : NSObject
+@interface LEALegalityElement : NSObject
 @property (nonatomic, assign) LEAFormat *format;
 @property (nonatomic, assign) LEALegalityLegality *legality;
 @end

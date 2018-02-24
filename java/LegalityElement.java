@@ -3,7 +3,7 @@ package io.quicktype;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.*;
 
-public class CardLegality {
+public class LegalityElement {
     private Format format;
     private LegalityLegality legality;
 

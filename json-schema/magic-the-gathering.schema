@@ -1,7 +1,7 @@
 {
     "$ref": "#/definitions/LEAExtras",
     "definitions": {
-        "CardLegality": {
+        "LegalityElement": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -102,7 +102,7 @@
                 "legalities": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/CardLegality"
+                        "$ref": "#/definitions/LegalityElement"
                     }
                 },
                 "manaCost": {

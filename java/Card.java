@@ -9,7 +9,7 @@ public class Card {
     private String id;
     private String imageName;
     private Layout layout;
-    private CardLegality[] legalities;
+    private LegalityElement[] legalities;
     private String manaCost;
     private String mciNumber;
     private long multiverseid;
@@ -43,9 +43,9 @@ public class Card {
     public void setCmc(long value) { this.cmc = value; }
 
     @JsonProperty("id")
-    public String getId() { return id; }
+    public String getID() { return id; }
     @JsonProperty("id")
-    public void setId(String value) { this.id = value; }
+    public void setID(String value) { this.id = value; }
 
     @JsonProperty("imageName")
     public String getImageName() { return imageName; }
@@ -58,9 +58,9 @@ public class Card {
     public void setLayout(Layout value) { this.layout = value; }
 
     @JsonProperty("legalities")
-    public CardLegality[] getLegalities() { return legalities; }
+    public LegalityElement[] getLegalities() { return legalities; }
     @JsonProperty("legalities")
-    public void setLegalities(CardLegality[] value) { this.legalities = value; }
+    public void setLegalities(LegalityElement[] value) { this.legalities = value; }
 
     @JsonProperty("manaCost")
     public String getManaCost() { return manaCost; }

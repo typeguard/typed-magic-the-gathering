@@ -1,9 +1,9 @@
 -- To decode the JSON data, add this file to your project, run
---
+-- 
 --     elm-package install NoRedInk/elm-decode-pipeline
---
+-- 
 -- add these imports
---
+-- 
 --     import Json.Decode exposing (decodeString)`);
 --     import QuickType exposing (leaExtras)
 --
@@ -16,7 +16,7 @@ module QuickType exposing
     , leaExtrasToString
     , leaExtras
     , Card
-    , CardLegality
+    , LegalityElement
     , Ruling
     , Booster(..)
     , ColorIdentity(..)
@@ -42,7 +42,7 @@ type alias LEAExtras =
     , magicCardsInfoCode : String
     , releaseDate : String
     , border : String
-    , purpleType : String
+    , leaExtrasType : String
     , booster : Array Booster
     , mkmName : String
     , mkmID : Int
@@ -60,7 +60,7 @@ type alias Card =
     , id : String
     , imageName : String
     , layout : Layout
-    , legalities : Array CardLegality
+    , legalities : Array LegalityElement
     , manaCost : Maybe String
     , mciNumber : Maybe String
     , multiverseid : Int
@@ -71,7 +71,7 @@ type alias Card =
     , rarity : Rarity
     , rulings : Maybe (Array Ruling)
     , text : Maybe String
-    , purpleType : String
+    , cardType : String
     , types : Array Type
     , reserved : Maybe Bool
     , power : Maybe String
@@ -101,7 +101,7 @@ type Color
 type Layout
     = Normal
 
-type alias CardLegality =
+type alias LegalityElement =
     { format : Format
     , legality : LegalityLegality
     }
@@ -146,9 +146,9 @@ type LegalityLegality
 
 type Rarity
     = BasicLand
-    | PurpleCommon
-    | PurpleRare
-    | PurpleUncommon
+    | RarityCommon
+    | RarityRare
+    | RarityUncommon
 
 type alias Ruling =
     { date : String
@@ -195,7 +195,7 @@ encodeLEAExtras x =
         , ("magicCardsInfoCode", Jenc.string x.magicCardsInfoCode)
         , ("releaseDate", Jenc.string x.releaseDate)
         , ("border", Jenc.string x.border)
-        , ("type", Jenc.string x.purpleType)
+        , ("type", Jenc.string x.leaExtrasType)
         , ("booster", makeArrayEncoder encodeBooster x.booster)
         , ("mkm_name", Jenc.string x.mkmName)
         , ("mkm_id", Jenc.int x.mkmID)
@@ -227,7 +227,7 @@ card =
         |> Jpipe.required "id" Jdec.string
         |> Jpipe.required "imageName" Jdec.string
         |> Jpipe.required "layout" layout
-        |> Jpipe.required "legalities" (Jdec.array cardLegality)
+        |> Jpipe.required "legalities" (Jdec.array legalityElement)
         |> Jpipe.optional "manaCost" (Jdec.nullable Jdec.string) Nothing
         |> Jpipe.optional "mciNumber" (Jdec.nullable Jdec.string) Nothing
         |> Jpipe.required "multiverseid" Jdec.int
@@ -258,7 +258,7 @@ encodeCard x =
         , ("id", Jenc.string x.id)
         , ("imageName", Jenc.string x.imageName)
         , ("layout", encodeLayout x.layout)
-        , ("legalities", makeArrayEncoder encodeCardLegality x.legalities)
+        , ("legalities", makeArrayEncoder encodeLegalityElement x.legalities)
         , ("manaCost", makeNullableEncoder Jenc.string x.manaCost)
         , ("mciNumber", makeNullableEncoder Jenc.string x.mciNumber)
         , ("multiverseid", Jenc.int x.multiverseid)
@@ -269,7 +269,7 @@ encodeCard x =
         , ("rarity", encodeRarity x.rarity)
         , ("rulings", makeNullableEncoder (makeArrayEncoder encodeRuling) x.rulings)
         , ("text", makeNullableEncoder Jenc.string x.text)
-        , ("type", Jenc.string x.purpleType)
+        , ("type", Jenc.string x.cardType)
         , ("types", makeArrayEncoder encodeType x.types)
         , ("reserved", makeNullableEncoder Jenc.bool x.reserved)
         , ("power", makeNullableEncoder Jenc.string x.power)
@@ -337,14 +337,14 @@ encodeLayout : Layout -> Jenc.Value
 encodeLayout x = case x of
     Normal -> Jenc.string "normal"
 
-cardLegality : Jdec.Decoder CardLegality
-cardLegality =
-    Jpipe.decode CardLegality
+legalityElement : Jdec.Decoder LegalityElement
+legalityElement =
+    Jpipe.decode LegalityElement
         |> Jpipe.required "format" format
         |> Jpipe.required "legality" legalityLegality
 
-encodeCardLegality : CardLegality -> Jenc.Value
-encodeCardLegality x =
+encodeLegalityElement : LegalityElement -> Jenc.Value
+encodeLegalityElement x =
     Jenc.object
         [ ("format", encodeFormat x.format)
         , ("legality", encodeLegalityLegality x.legality)
@@ -446,18 +446,18 @@ rarity =
         |> Jdec.andThen (\str ->
             case str of
                 "Basic Land" -> Jdec.succeed BasicLand
-                "Common" -> Jdec.succeed PurpleCommon
-                "Rare" -> Jdec.succeed PurpleRare
-                "Uncommon" -> Jdec.succeed PurpleUncommon
+                "Common" -> Jdec.succeed RarityCommon
+                "Rare" -> Jdec.succeed RarityRare
+                "Uncommon" -> Jdec.succeed RarityUncommon
                 somethingElse -> Jdec.fail <| "Invalid Rarity: " ++ somethingElse
         )
 
 encodeRarity : Rarity -> Jenc.Value
 encodeRarity x = case x of
     BasicLand -> Jenc.string "Basic Land"
-    PurpleCommon -> Jenc.string "Common"
-    PurpleRare -> Jenc.string "Rare"
-    PurpleUncommon -> Jenc.string "Uncommon"
+    RarityCommon -> Jenc.string "Common"
+    RarityRare -> Jenc.string "Rare"
+    RarityUncommon -> Jenc.string "Uncommon"
 
 ruling : Jdec.Decoder Ruling
 ruling =

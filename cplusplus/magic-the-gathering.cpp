@@ -1,10 +1,10 @@
 //  To parse this JSON data, first install
-//
+// 
 //      Boost     http://www.boost.org
 //      json.hpp  https://github.com/nlohmann/json
-//
+// 
 //  Then include this file, and then do
-//
+// 
 //     LeaExtras data = nlohmann::json::parse(jsonString);
 
 #include "json.hpp"
@@ -24,7 +24,7 @@ namespace quicktype {
 
     enum class LegalityLegality { BANNED, LEGAL, RESTRICTED };
 
-    struct CardLegality {
+    struct LegalityElement {
         Format format;
         LegalityLegality legality;
     };
@@ -46,7 +46,7 @@ namespace quicktype {
         std::string id;
         std::string image_name;
         Layout layout;
-        std::vector<struct CardLegality> legalities;
+        std::vector<struct LegalityElement> legalities;
         std::unique_ptr<std::string> mana_cost;
         std::unique_ptr<std::string> mci_number;
         int64_t multiverseid;
@@ -117,12 +117,12 @@ namespace nlohmann {
         }
     };
 
-    inline void from_json(const json& _j, struct quicktype::CardLegality& _x) {
+    inline void from_json(const json& _j, struct quicktype::LegalityElement& _x) {
         _x.format = _j.at("format").get<quicktype::Format>();
         _x.legality = _j.at("legality").get<quicktype::LegalityLegality>();
     }
 
-    inline void to_json(json& _j, const struct quicktype::CardLegality& _x) {
+    inline void to_json(json& _j, const struct quicktype::LegalityElement& _x) {
         _j = json::object();
         _j["format"] = _x.format;
         _j["legality"] = _x.legality;
@@ -145,7 +145,7 @@ namespace nlohmann {
         _x.id = _j.at("id").get<std::string>();
         _x.image_name = _j.at("imageName").get<std::string>();
         _x.layout = _j.at("layout").get<quicktype::Layout>();
-        _x.legalities = _j.at("legalities").get<std::vector<struct quicktype::CardLegality>>();
+        _x.legalities = _j.at("legalities").get<std::vector<struct quicktype::LegalityElement>>();
         _x.mana_cost = quicktype::get_optional<std::string>(_j, "manaCost");
         _x.mci_number = quicktype::get_optional<std::string>(_j, "mciNumber");
         _x.multiverseid = _j.at("multiverseid").get<int64_t>();
@@ -436,5 +436,4 @@ namespace nlohmann {
             default: throw "This should not happen";
         }
     }
-
 }

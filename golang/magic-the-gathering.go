@@ -1,7 +1,7 @@
 // To parse and unparse this JSON data, add this code to your project and do:
 //
-//    r, err := UnmarshalLEAExtras(bytes)
-//    bytes, err = r.Marshal()
+//    lEAExtras, err := UnmarshalLEAExtras(bytes)
+//    bytes, err = lEAExtras.Marshal()
 
 package main
 
@@ -18,51 +18,51 @@ func (r *LEAExtras) Marshal() ([]byte, error) {
 }
 
 type LEAExtras struct {
-	Name               string    `json:"name"`
-	Code               string    `json:"code"`
-	GathererCode       string    `json:"gathererCode"`
+	Name               string    `json:"name"`              
+	Code               string    `json:"code"`              
+	GathererCode       string    `json:"gathererCode"`      
 	MagicCardsInfoCode string    `json:"magicCardsInfoCode"`
-	ReleaseDate        string    `json:"releaseDate"`
-	Border             string    `json:"border"`
-	Type               string    `json:"type"`
-	Booster            []Booster `json:"booster"`
-	MkmName            string    `json:"mkm_name"`
-	MkmID              int64     `json:"mkm_id"`
-	Cards              []Card    `json:"cards"`
+	ReleaseDate        string    `json:"releaseDate"`       
+	Border             string    `json:"border"`            
+	Type               string    `json:"type"`              
+	Booster            []Booster `json:"booster"`           
+	MkmName            string    `json:"mkm_name"`          
+	MkmID              int64     `json:"mkm_id"`            
+	Cards              []Card    `json:"cards"`             
 }
 
 type Card struct {
-	Artist        string          `json:"artist"`
-	Cmc           int64           `json:"cmc"`
-	ID            string          `json:"id"`
-	ImageName     string          `json:"imageName"`
-	Layout        Layout          `json:"layout"`
-	Legalities    []CardLegality  `json:"legalities"`
-	ManaCost      *string         `json:"manaCost"`
-	MciNumber     *string         `json:"mciNumber"`
-	Multiverseid  int64           `json:"multiverseid"`
-	Name          string          `json:"name"`
-	OriginalText  *string         `json:"originalText"`
-	OriginalType  string          `json:"originalType"`
-	Printings     []string        `json:"printings"`
-	Rarity        Rarity          `json:"rarity"`
-	Rulings       []Ruling        `json:"rulings"`
-	Text          *string         `json:"text"`
-	Type          string          `json:"type"`
-	Types         []Type          `json:"types"`
-	Reserved      *bool           `json:"reserved"`
-	Power         *string         `json:"power"`
-	Subtypes      []string        `json:"subtypes"`
-	Toughness     *string         `json:"toughness"`
-	ColorIdentity []ColorIdentity `json:"colorIdentity"`
-	Flavor        *string         `json:"flavor"`
-	Colors        []Color         `json:"colors"`
-	Supertypes    []Supertype     `json:"supertypes"`
-	Variations    []int64         `json:"variations"`
+	Artist        string            `json:"artist"`       
+	Cmc           int64             `json:"cmc"`          
+	ID            string            `json:"id"`           
+	ImageName     string            `json:"imageName"`    
+	Layout        Layout            `json:"layout"`       
+	Legalities    []LegalityElement `json:"legalities"`   
+	ManaCost      *string           `json:"manaCost"`     
+	MciNumber     *string           `json:"mciNumber"`    
+	Multiverseid  int64             `json:"multiverseid"` 
+	Name          string            `json:"name"`         
+	OriginalText  *string           `json:"originalText"` 
+	OriginalType  string            `json:"originalType"` 
+	Printings     []string          `json:"printings"`    
+	Rarity        Rarity            `json:"rarity"`       
+	Rulings       []Ruling          `json:"rulings"`      
+	Text          *string           `json:"text"`         
+	Type          string            `json:"type"`         
+	Types         []Type            `json:"types"`        
+	Reserved      *bool             `json:"reserved"`     
+	Power         *string           `json:"power"`        
+	Subtypes      []string          `json:"subtypes"`     
+	Toughness     *string           `json:"toughness"`    
+	ColorIdentity []ColorIdentity   `json:"colorIdentity"`
+	Flavor        *string           `json:"flavor"`       
+	Colors        []Color           `json:"colors"`       
+	Supertypes    []Supertype       `json:"supertypes"`   
+	Variations    []int64           `json:"variations"`   
 }
 
-type CardLegality struct {
-	Format   Format           `json:"format"`
+type LegalityElement struct {
+	Format   Format           `json:"format"`  
 	Legality LegalityLegality `json:"legality"`
 }
 
@@ -146,9 +146,9 @@ const (
 type Rarity string
 const (
 	BasicLand Rarity = "Basic Land"
-	PurpleCommon Rarity = "Common"
-	PurpleRare Rarity = "Rare"
-	PurpleUncommon Rarity = "Uncommon"
+	RarityCommon Rarity = "Common"
+	RarityRare Rarity = "Rare"
+	RarityUncommon Rarity = "Uncommon"
 )
 
 type Supertype string

@@ -18,7 +18,7 @@ class Card {
     id: String
     imageName: String
     layout: Layout
-    legalities: List<CardLegality>
+    legalities: List<LegalityElement>
     manaCost?: String
     mciNumber?: String
     multiverseid: Int
@@ -42,7 +42,7 @@ class Card {
     variations?: List<Int>
 }
 
-class CardLegality {
+class LegalityElement {
     format: Format
     legality: LegalityLegality
 }

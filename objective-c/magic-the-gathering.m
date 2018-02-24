@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDictionary *)JSONDictionary;
 @end
 
-@interface LEACardLegality (JSONConversion)
+@interface LEALegalityElement (JSONConversion)
 + (instancetype)fromJSONDictionary:(NSDictionary *)dict;
 - (NSDictionary *)JSONDictionary;
 @end
@@ -526,7 +526,7 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
     if (self = [super init]) {
         [self setValuesForKeysWithDictionary:dict];
         _layout = [LEALayout withValue:(id)_layout];
-        _legalities = map(_legalities, λ(id x, [LEACardLegality fromJSONDictionary:x]));
+        _legalities = map(_legalities, λ(id x, [LEALegalityElement fromJSONDictionary:x]));
         _rarity = [LEARarity withValue:(id)_rarity];
         _rulings = map(_rulings, λ(id x, [LEARuling fromJSONDictionary:x]));
         _types = map(_types, λ(id x, [LEAType withValue:x]));
@@ -569,7 +569,7 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
 }
 @end
 
-@implementation LEACardLegality
+@implementation LEALegalityElement
 + (NSDictionary<NSString *, NSString *> *)properties
 {
     static NSDictionary<NSString *, NSString *> *properties;
@@ -581,7 +581,7 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
 
 + (instancetype)fromJSONDictionary:(NSDictionary *)dict
 {
-    return dict ? [[LEACardLegality alloc] initWithJSONDictionary:dict] : nil;
+    return dict ? [[LEALegalityElement alloc] initWithJSONDictionary:dict] : nil;
 }
 
 - (instancetype)initWithJSONDictionary:(NSDictionary *)dict
@@ -596,7 +596,7 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
 
 - (NSDictionary *)JSONDictionary
 {
-    id dict = [[self dictionaryWithValuesForKeys:LEACardLegality.properties.allValues] mutableCopy];
+    id dict = [[self dictionaryWithValuesForKeys:LEALegalityElement.properties.allValues] mutableCopy];
 
     [dict addEntriesFromDictionary:@{
         @"format": [_format value],

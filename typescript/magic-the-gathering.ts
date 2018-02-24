@@ -33,7 +33,7 @@ export interface Card {
     id:             string;
     imageName:      string;
     layout:         Layout;
-    legalities:     CardLegality[];
+    legalities:     LegalityElement[];
     manaCost?:      string;
     mciNumber?:     string;
     multiverseid:   number;
@@ -77,7 +77,7 @@ export enum Layout {
     Normal = "normal",
 }
 
-export interface CardLegality {
+export interface LegalityElement {
     format:   Format;
     legality: LegalityLegality;
 }
@@ -151,7 +151,7 @@ export enum Type {
 // and asserts the results of JSON.parse at runtime
 export module Convert {
     export function toLEAExtras(json: string): LEAExtras {
-        return cast(JSON.parse(json), O("LEAExtras"));
+        return cast(JSON.parse(json), o("LEAExtras"));
     }
 
     export function lEAExtrasToJson(value: LEAExtras): string {
@@ -192,7 +192,7 @@ export module Convert {
 
     function isValidArray(typ: any, val: any): boolean {
         // val must be an array with no invalid elements
-        return Array.isArray(val) && val.every((element, i) => {
+        return Array.isArray(val) && val.every(element => {
             return isValid(typ, element);
         });
     }
@@ -215,23 +215,23 @@ export module Convert {
         });
     }
 
-    function A(typ: any) {
+    function a(typ: any) {
         return { typ, isArray: true };
     }
 
-    function E(name: string) {
+    function e(name: string) {
         return { name, isEnum: true };
     }
 
-    function U(...typs: any[]) {
+    function u(...typs: any[]) {
         return { typs, isUnion: true };
     }
 
-    function M(typ: any) {
+    function m(typ: any) {
         return { typ, isMap: true };
     }
 
-    function O(className: string) {
+    function o(className: string) {
         return { cls: className, isObject: true };
     }
 
@@ -244,124 +244,124 @@ export module Convert {
             releaseDate: "",
             border: "",
             type: "",
-            booster: A(E("Booster")),
+            booster: a(e("Booster")),
             mkm_name: "",
             mkm_id: 0,
-            cards: A(O("Card")),
+            cards: a(o("Card")),
         },
         "Card": {
             artist: "",
             cmc: 0,
             id: "",
             imageName: "",
-            layout: E("Layout"),
-            legalities: A(O("CardLegality")),
-            manaCost: U(null, ""),
-            mciNumber: U(null, ""),
+            layout: e("Layout"),
+            legalities: a(o("LegalityElement")),
+            manaCost: u(null, ""),
+            mciNumber: u(null, ""),
             multiverseid: 0,
             name: "",
-            originalText: U(null, ""),
+            originalText: u(null, ""),
             originalType: "",
-            printings: A(""),
-            rarity: E("Rarity"),
-            rulings: U(null, A(O("Ruling"))),
-            text: U(null, ""),
+            printings: a(""),
+            rarity: e("Rarity"),
+            rulings: u(null, a(o("Ruling"))),
+            text: u(null, ""),
             type: "",
-            types: A(E("Type")),
-            reserved: U(null, false),
-            power: U(null, ""),
-            subtypes: U(null, A("")),
-            toughness: U(null, ""),
-            colorIdentity: U(null, A(E("ColorIdentity"))),
-            flavor: U(null, ""),
-            colors: U(null, A(E("Color"))),
-            supertypes: U(null, A(E("Supertype"))),
-            variations: U(null, A(0)),
+            types: a(e("Type")),
+            reserved: u(null, false),
+            power: u(null, ""),
+            subtypes: u(null, a("")),
+            toughness: u(null, ""),
+            colorIdentity: u(null, a(e("ColorIdentity"))),
+            flavor: u(null, ""),
+            colors: u(null, a(e("Color"))),
+            supertypes: u(null, a(e("Supertype"))),
+            variations: u(null, a(0)),
         },
-        "CardLegality": {
-            format: E("Format"),
-            legality: E("LegalityLegality"),
+        "LegalityElement": {
+            format: e("Format"),
+            legality: e("LegalityLegality"),
         },
         "Ruling": {
             date: "",
             text: "",
         },
         "Booster": [
-            Booster.Common,
-            Booster.Rare,
-            Booster.Uncommon,
+            "common",
+            "rare",
+            "uncommon",
         ],
         "ColorIdentity": [
-            ColorIdentity.B,
-            ColorIdentity.G,
-            ColorIdentity.R,
-            ColorIdentity.U,
-            ColorIdentity.W,
+            "B",
+            "G",
+            "R",
+            "U",
+            "W",
         ],
         "Color": [
-            Color.Black,
-            Color.Blue,
-            Color.Green,
-            Color.Red,
-            Color.White,
+            "Black",
+            "Blue",
+            "Green",
+            "Red",
+            "White",
         ],
         "Layout": [
-            Layout.Normal,
+            "normal",
         ],
         "Format": [
-            Format.AmonkhetBlock,
-            Format.BattleForZendikarBlock,
-            Format.Commander,
-            Format.IceAgeBlock,
-            Format.InnistradBlock,
-            Format.InvasionBlock,
-            Format.IxalanBlock,
-            Format.KaladeshBlock,
-            Format.KamigawaBlock,
-            Format.KhansOfTarkirBlock,
-            Format.Legacy,
-            Format.LorwynShadowmoorBlock,
-            Format.MasquesBlock,
-            Format.MirageBlock,
-            Format.MirrodinBlock,
-            Format.Modern,
-            Format.OdysseyBlock,
-            Format.OnslaughtBlock,
-            Format.RavnicaBlock,
-            Format.ReturnToRavnicaBlock,
-            Format.ScarsOfMirrodinBlock,
-            Format.ShadowsOverInnistradBlock,
-            Format.ShardsOfAlaraBlock,
-            Format.Standard,
-            Format.TempestBlock,
-            Format.TherosBlock,
-            Format.TimeSpiralBlock,
-            Format.UnSets,
-            Format.UrzaBlock,
-            Format.Vintage,
-            Format.ZendikarBlock,
+            "Amonkhet Block",
+            "Battle for Zendikar Block",
+            "Commander",
+            "Ice Age Block",
+            "Innistrad Block",
+            "Invasion Block",
+            "Ixalan Block",
+            "Kaladesh Block",
+            "Kamigawa Block",
+            "Khans of Tarkir Block",
+            "Legacy",
+            "Lorwyn-Shadowmoor Block",
+            "Masques Block",
+            "Mirage Block",
+            "Mirrodin Block",
+            "Modern",
+            "Odyssey Block",
+            "Onslaught Block",
+            "Ravnica Block",
+            "Return to Ravnica Block",
+            "Scars of Mirrodin Block",
+            "Shadows over Innistrad Block",
+            "Shards of Alara Block",
+            "Standard",
+            "Tempest Block",
+            "Theros Block",
+            "Time Spiral Block",
+            "Un-Sets",
+            "Urza Block",
+            "Vintage",
+            "Zendikar Block",
         ],
         "LegalityLegality": [
-            LegalityLegality.Banned,
-            LegalityLegality.Legal,
-            LegalityLegality.Restricted,
+            "Banned",
+            "Legal",
+            "Restricted",
         ],
         "Rarity": [
-            Rarity.BasicLand,
-            Rarity.Common,
-            Rarity.Rare,
-            Rarity.Uncommon,
+            "Basic Land",
+            "Common",
+            "Rare",
+            "Uncommon",
         ],
         "Supertype": [
-            Supertype.Basic,
+            "Basic",
         ],
         "Type": [
-            Type.Artifact,
-            Type.Creature,
-            Type.Enchantment,
-            Type.Instant,
-            Type.Land,
-            Type.Sorcery,
+            "Artifact",
+            "Creature",
+            "Enchantment",
+            "Instant",
+            "Land",
+            "Sorcery",
         ],
     };
 }

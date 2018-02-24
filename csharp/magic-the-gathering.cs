@@ -2,15 +2,17 @@
 //
 //    using QuickType;
 //
-//    var data = LeaExtras.FromJson(jsonString);
+//    var leaExtras = LeaExtras.FromJson(jsonString);
 
 namespace QuickType
 {
     using System;
-    using System.Net;
     using System.Collections.Generic;
+    using System.Net;
 
+    using System.Globalization;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public partial class LeaExtras
     {
@@ -27,13 +29,13 @@ namespace QuickType
         public string MagicCardsInfoCode { get; set; }
 
         [JsonProperty("releaseDate")]
-        public System.DateTime ReleaseDate { get; set; }
+        public System.DateTimeOffset ReleaseDate { get; set; }
 
         [JsonProperty("border")]
         public string Border { get; set; }
 
         [JsonProperty("type")]
-        public string PurpleType { get; set; }
+        public string Type { get; set; }
 
         [JsonProperty("booster")]
         public Booster[] Booster { get; set; }
@@ -66,7 +68,7 @@ namespace QuickType
         public Layout Layout { get; set; }
 
         [JsonProperty("legalities")]
-        public CardLegality[] Legalities { get; set; }
+        public LegalityElement[] Legalities { get; set; }
 
         [JsonProperty("manaCost")]
         public string ManaCost { get; set; }
@@ -99,10 +101,10 @@ namespace QuickType
         public string Text { get; set; }
 
         [JsonProperty("type")]
-        public string PurpleType { get; set; }
+        public string Type { get; set; }
 
         [JsonProperty("types")]
-        public PurpleType[] Types { get; set; }
+        public TypeElement[] Types { get; set; }
 
         [JsonProperty("reserved")]
         public bool? Reserved { get; set; }
@@ -132,7 +134,7 @@ namespace QuickType
         public long[] Variations { get; set; }
     }
 
-    public partial class CardLegality
+    public partial class LegalityElement
     {
         [JsonProperty("format")]
         public Format Format { get; set; }
@@ -144,7 +146,7 @@ namespace QuickType
     public partial class Ruling
     {
         [JsonProperty("date")]
-        public System.DateTime Date { get; set; }
+        public System.DateTimeOffset Date { get; set; }
 
         [JsonProperty("text")]
         public string Text { get; set; }
@@ -166,11 +168,11 @@ namespace QuickType
 
     public enum Supertype { Basic };
 
-    public enum PurpleType { Artifact, Creature, Enchantment, Instant, Land, Sorcery };
+    public enum TypeElement { Artifact, Creature, Enchantment, Instant, Land, Sorcery };
 
     public partial class LeaExtras
     {
-        public static LeaExtras FromJson(string json) => JsonConvert.DeserializeObject<LeaExtras>(json, Converter.Settings);
+        public static LeaExtras FromJson(string json) => JsonConvert.DeserializeObject<LeaExtras>(json, QuickType.Converter.Settings);
     }
 
     static class BoosterExtensions
@@ -487,23 +489,23 @@ namespace QuickType
         }
     }
 
-    static class PurpleTypeExtensions
+    static class TypeElementExtensions
     {
-        public static PurpleType? ValueForString(string str)
+        public static TypeElement? ValueForString(string str)
         {
             switch (str)
             {
-                case "Artifact": return PurpleType.Artifact;
-                case "Creature": return PurpleType.Creature;
-                case "Enchantment": return PurpleType.Enchantment;
-                case "Instant": return PurpleType.Instant;
-                case "Land": return PurpleType.Land;
-                case "Sorcery": return PurpleType.Sorcery;
+                case "Artifact": return TypeElement.Artifact;
+                case "Creature": return TypeElement.Creature;
+                case "Enchantment": return TypeElement.Enchantment;
+                case "Instant": return TypeElement.Instant;
+                case "Land": return TypeElement.Land;
+                case "Sorcery": return TypeElement.Sorcery;
                 default: return null;
             }
         }
 
-        public static PurpleType ReadJson(JsonReader reader, JsonSerializer serializer)
+        public static TypeElement ReadJson(JsonReader reader, JsonSerializer serializer)
         {
             var str = serializer.Deserialize<string>(reader);
             var maybeValue = ValueForString(str);
@@ -511,28 +513,28 @@ namespace QuickType
             throw new Exception("Unknown enum case " + str);
         }
 
-        public static void WriteJson(this PurpleType value, JsonWriter writer, JsonSerializer serializer)
+        public static void WriteJson(this TypeElement value, JsonWriter writer, JsonSerializer serializer)
         {
             switch (value)
             {
-                case PurpleType.Artifact: serializer.Serialize(writer, "Artifact"); break;
-                case PurpleType.Creature: serializer.Serialize(writer, "Creature"); break;
-                case PurpleType.Enchantment: serializer.Serialize(writer, "Enchantment"); break;
-                case PurpleType.Instant: serializer.Serialize(writer, "Instant"); break;
-                case PurpleType.Land: serializer.Serialize(writer, "Land"); break;
-                case PurpleType.Sorcery: serializer.Serialize(writer, "Sorcery"); break;
+                case TypeElement.Artifact: serializer.Serialize(writer, "Artifact"); break;
+                case TypeElement.Creature: serializer.Serialize(writer, "Creature"); break;
+                case TypeElement.Enchantment: serializer.Serialize(writer, "Enchantment"); break;
+                case TypeElement.Instant: serializer.Serialize(writer, "Instant"); break;
+                case TypeElement.Land: serializer.Serialize(writer, "Land"); break;
+                case TypeElement.Sorcery: serializer.Serialize(writer, "Sorcery"); break;
             }
         }
     }
 
     public static class Serialize
     {
-        public static string ToJson(this LeaExtras self) => JsonConvert.SerializeObject(self, Converter.Settings);
+        public static string ToJson(this LeaExtras self) => JsonConvert.SerializeObject(self, QuickType.Converter.Settings);
     }
 
-    public class Converter: JsonConverter
+    internal class Converter: JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Booster) || t == typeof(ColorIdentity) || t == typeof(Color) || t == typeof(Layout) || t == typeof(Format) || t == typeof(LegalityLegality) || t == typeof(Rarity) || t == typeof(Supertype) || t == typeof(PurpleType) || t == typeof(Booster?) || t == typeof(ColorIdentity?) || t == typeof(Color?) || t == typeof(Layout?) || t == typeof(Format?) || t == typeof(LegalityLegality?) || t == typeof(Rarity?) || t == typeof(Supertype?) || t == typeof(PurpleType?);
+        public override bool CanConvert(Type t) => t == typeof(Booster) || t == typeof(ColorIdentity) || t == typeof(Color) || t == typeof(Layout) || t == typeof(Format) || t == typeof(LegalityLegality) || t == typeof(Rarity) || t == typeof(Supertype) || t == typeof(TypeElement) || t == typeof(Booster?) || t == typeof(ColorIdentity?) || t == typeof(Color?) || t == typeof(Layout?) || t == typeof(Format?) || t == typeof(LegalityLegality?) || t == typeof(Rarity?) || t == typeof(Supertype?) || t == typeof(TypeElement?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -552,8 +554,8 @@ namespace QuickType
                 return RarityExtensions.ReadJson(reader, serializer);
             if (t == typeof(Supertype))
                 return SupertypeExtensions.ReadJson(reader, serializer);
-            if (t == typeof(PurpleType))
-                return PurpleTypeExtensions.ReadJson(reader, serializer);
+            if (t == typeof(TypeElement))
+                return TypeElementExtensions.ReadJson(reader, serializer);
             if (t == typeof(Booster?))
             {
                 if (reader.TokenType == JsonToken.Null) return null;
@@ -594,10 +596,10 @@ namespace QuickType
                 if (reader.TokenType == JsonToken.Null) return null;
                 return SupertypeExtensions.ReadJson(reader, serializer);
             }
-            if (t == typeof(PurpleType?))
+            if (t == typeof(TypeElement?))
             {
                 if (reader.TokenType == JsonToken.Null) return null;
-                return PurpleTypeExtensions.ReadJson(reader, serializer);
+                return TypeElementExtensions.ReadJson(reader, serializer);
             }
             throw new Exception("Unknown type");
         }
@@ -645,9 +647,9 @@ namespace QuickType
                 ((Supertype)value).WriteJson(writer, serializer);
                 return;
             }
-            if (t == typeof(PurpleType))
+            if (t == typeof(TypeElement))
             {
-                ((PurpleType)value).WriteJson(writer, serializer);
+                ((TypeElement)value).WriteJson(writer, serializer);
                 return;
             }
             throw new Exception("Unknown type");
@@ -657,7 +659,13 @@ namespace QuickType
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
             DateParseHandling = DateParseHandling.None,
-            Converters = { new Converter() },
+            Converters = { 
+                new Converter(),
+                new IsoDateTimeConverter()
+                {
+                    DateTimeStyles = DateTimeStyles.AssumeUniversal,
+                },
+            },
         };
     }
 }
