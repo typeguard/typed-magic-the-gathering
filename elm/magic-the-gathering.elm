@@ -1,9 +1,9 @@
 -- To decode the JSON data, add this file to your project, run
--- 
+--
 --     elm-package install NoRedInk/elm-decode-pipeline
--- 
+--
 -- add these imports
--- 
+--
 --     import Json.Decode exposing (decodeString)`);
 --     import QuickType exposing (leaExtras)
 --
@@ -23,7 +23,7 @@ module QuickType exposing
     , Color(..)
     , Layout(..)
     , Format(..)
-    , LegalityLegality(..)
+    , LegalityEnum(..)
     , Rarity(..)
     , Supertype(..)
     , Type(..)
@@ -103,43 +103,18 @@ type Layout
 
 type alias LegalityElement =
     { format : Format
-    , legality : LegalityLegality
+    , legality : LegalityEnum
     }
 
 type Format
-    = AmonkhetBlock
-    | BattleForZendikarBlock
+    = Brawl
     | Commander
-    | IceAgeBlock
-    | InnistradBlock
-    | InvasionBlock
-    | IxalanBlock
-    | KaladeshBlock
-    | KamigawaBlock
-    | KhansOfTarkirBlock
     | Legacy
-    | LorwynShadowmoorBlock
-    | MasquesBlock
-    | MirageBlock
-    | MirrodinBlock
     | Modern
-    | OdysseyBlock
-    | OnslaughtBlock
-    | RavnicaBlock
-    | ReturnToRavnicaBlock
-    | ScarsOfMirrodinBlock
-    | ShadowsOverInnistradBlock
-    | ShardsOfAlaraBlock
     | Standard
-    | TempestBlock
-    | TherosBlock
-    | TimeSpiralBlock
-    | UnSets
-    | UrzaBlock
     | Vintage
-    | ZendikarBlock
 
-type LegalityLegality
+type LegalityEnum
     = Banned
     | Legal
     | Restricted
@@ -341,13 +316,13 @@ legalityElement : Jdec.Decoder LegalityElement
 legalityElement =
     Jpipe.decode LegalityElement
         |> Jpipe.required "format" format
-        |> Jpipe.required "legality" legalityLegality
+        |> Jpipe.required "legality" legalityEnum
 
 encodeLegalityElement : LegalityElement -> Jenc.Value
 encodeLegalityElement x =
     Jenc.object
         [ ("format", encodeFormat x.format)
-        , ("legality", encodeLegalityLegality x.legality)
+        , ("legality", encodeLegalityEnum x.legality)
         ]
 
 format : Jdec.Decoder Format
@@ -355,87 +330,37 @@ format =
     Jdec.string
         |> Jdec.andThen (\str ->
             case str of
-                "Amonkhet Block" -> Jdec.succeed AmonkhetBlock
-                "Battle for Zendikar Block" -> Jdec.succeed BattleForZendikarBlock
+                "Brawl" -> Jdec.succeed Brawl
                 "Commander" -> Jdec.succeed Commander
-                "Ice Age Block" -> Jdec.succeed IceAgeBlock
-                "Innistrad Block" -> Jdec.succeed InnistradBlock
-                "Invasion Block" -> Jdec.succeed InvasionBlock
-                "Ixalan Block" -> Jdec.succeed IxalanBlock
-                "Kaladesh Block" -> Jdec.succeed KaladeshBlock
-                "Kamigawa Block" -> Jdec.succeed KamigawaBlock
-                "Khans of Tarkir Block" -> Jdec.succeed KhansOfTarkirBlock
                 "Legacy" -> Jdec.succeed Legacy
-                "Lorwyn-Shadowmoor Block" -> Jdec.succeed LorwynShadowmoorBlock
-                "Masques Block" -> Jdec.succeed MasquesBlock
-                "Mirage Block" -> Jdec.succeed MirageBlock
-                "Mirrodin Block" -> Jdec.succeed MirrodinBlock
                 "Modern" -> Jdec.succeed Modern
-                "Odyssey Block" -> Jdec.succeed OdysseyBlock
-                "Onslaught Block" -> Jdec.succeed OnslaughtBlock
-                "Ravnica Block" -> Jdec.succeed RavnicaBlock
-                "Return to Ravnica Block" -> Jdec.succeed ReturnToRavnicaBlock
-                "Scars of Mirrodin Block" -> Jdec.succeed ScarsOfMirrodinBlock
-                "Shadows over Innistrad Block" -> Jdec.succeed ShadowsOverInnistradBlock
-                "Shards of Alara Block" -> Jdec.succeed ShardsOfAlaraBlock
                 "Standard" -> Jdec.succeed Standard
-                "Tempest Block" -> Jdec.succeed TempestBlock
-                "Theros Block" -> Jdec.succeed TherosBlock
-                "Time Spiral Block" -> Jdec.succeed TimeSpiralBlock
-                "Un-Sets" -> Jdec.succeed UnSets
-                "Urza Block" -> Jdec.succeed UrzaBlock
                 "Vintage" -> Jdec.succeed Vintage
-                "Zendikar Block" -> Jdec.succeed ZendikarBlock
                 somethingElse -> Jdec.fail <| "Invalid Format: " ++ somethingElse
         )
 
 encodeFormat : Format -> Jenc.Value
 encodeFormat x = case x of
-    AmonkhetBlock -> Jenc.string "Amonkhet Block"
-    BattleForZendikarBlock -> Jenc.string "Battle for Zendikar Block"
+    Brawl -> Jenc.string "Brawl"
     Commander -> Jenc.string "Commander"
-    IceAgeBlock -> Jenc.string "Ice Age Block"
-    InnistradBlock -> Jenc.string "Innistrad Block"
-    InvasionBlock -> Jenc.string "Invasion Block"
-    IxalanBlock -> Jenc.string "Ixalan Block"
-    KaladeshBlock -> Jenc.string "Kaladesh Block"
-    KamigawaBlock -> Jenc.string "Kamigawa Block"
-    KhansOfTarkirBlock -> Jenc.string "Khans of Tarkir Block"
     Legacy -> Jenc.string "Legacy"
-    LorwynShadowmoorBlock -> Jenc.string "Lorwyn-Shadowmoor Block"
-    MasquesBlock -> Jenc.string "Masques Block"
-    MirageBlock -> Jenc.string "Mirage Block"
-    MirrodinBlock -> Jenc.string "Mirrodin Block"
     Modern -> Jenc.string "Modern"
-    OdysseyBlock -> Jenc.string "Odyssey Block"
-    OnslaughtBlock -> Jenc.string "Onslaught Block"
-    RavnicaBlock -> Jenc.string "Ravnica Block"
-    ReturnToRavnicaBlock -> Jenc.string "Return to Ravnica Block"
-    ScarsOfMirrodinBlock -> Jenc.string "Scars of Mirrodin Block"
-    ShadowsOverInnistradBlock -> Jenc.string "Shadows over Innistrad Block"
-    ShardsOfAlaraBlock -> Jenc.string "Shards of Alara Block"
     Standard -> Jenc.string "Standard"
-    TempestBlock -> Jenc.string "Tempest Block"
-    TherosBlock -> Jenc.string "Theros Block"
-    TimeSpiralBlock -> Jenc.string "Time Spiral Block"
-    UnSets -> Jenc.string "Un-Sets"
-    UrzaBlock -> Jenc.string "Urza Block"
     Vintage -> Jenc.string "Vintage"
-    ZendikarBlock -> Jenc.string "Zendikar Block"
 
-legalityLegality : Jdec.Decoder LegalityLegality
-legalityLegality =
+legalityEnum : Jdec.Decoder LegalityEnum
+legalityEnum =
     Jdec.string
         |> Jdec.andThen (\str ->
             case str of
                 "Banned" -> Jdec.succeed Banned
                 "Legal" -> Jdec.succeed Legal
                 "Restricted" -> Jdec.succeed Restricted
-                somethingElse -> Jdec.fail <| "Invalid LegalityLegality: " ++ somethingElse
+                somethingElse -> Jdec.fail <| "Invalid LegalityEnum: " ++ somethingElse
         )
 
-encodeLegalityLegality : LegalityLegality -> Jenc.Value
-encodeLegalityLegality x = case x of
+encodeLegalityEnum : LegalityEnum -> Jenc.Value
+encodeLegalityEnum x = case x of
     Banned -> Jenc.string "Banned"
     Legal -> Jenc.string "Legal"
     Restricted -> Jenc.string "Restricted"

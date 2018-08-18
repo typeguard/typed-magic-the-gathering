@@ -32,38 +32,38 @@ type LEAExtras struct {
 }
 
 type Card struct {
-	Artist        string            `json:"artist"`       
-	Cmc           int64             `json:"cmc"`          
-	ID            string            `json:"id"`           
-	ImageName     string            `json:"imageName"`    
-	Layout        Layout            `json:"layout"`       
-	Legalities    []LegalityElement `json:"legalities"`   
-	ManaCost      *string           `json:"manaCost"`     
-	MciNumber     *string           `json:"mciNumber"`    
-	Multiverseid  int64             `json:"multiverseid"` 
-	Name          string            `json:"name"`         
-	OriginalText  *string           `json:"originalText"` 
-	OriginalType  string            `json:"originalType"` 
-	Printings     []string          `json:"printings"`    
-	Rarity        Rarity            `json:"rarity"`       
-	Rulings       []Ruling          `json:"rulings"`      
-	Text          *string           `json:"text"`         
-	Type          string            `json:"type"`         
-	Types         []Type            `json:"types"`        
-	Reserved      *bool             `json:"reserved"`     
-	Power         *string           `json:"power"`        
-	Subtypes      []string          `json:"subtypes"`     
-	Toughness     *string           `json:"toughness"`    
-	ColorIdentity []ColorIdentity   `json:"colorIdentity"`
-	Flavor        *string           `json:"flavor"`       
-	Colors        []Color           `json:"colors"`       
-	Supertypes    []Supertype       `json:"supertypes"`   
-	Variations    []int64           `json:"variations"`   
+	Artist        string            `json:"artist"`                
+	Cmc           int64             `json:"cmc"`                   
+	ID            string            `json:"id"`                    
+	ImageName     string            `json:"imageName"`             
+	Layout        Layout            `json:"layout"`                
+	Legalities    []LegalityElement `json:"legalities"`            
+	ManaCost      *string           `json:"manaCost,omitempty"`    
+	MciNumber     *string           `json:"mciNumber,omitempty"`   
+	Multiverseid  int64             `json:"multiverseid"`          
+	Name          string            `json:"name"`                  
+	OriginalText  *string           `json:"originalText,omitempty"`
+	OriginalType  string            `json:"originalType"`          
+	Printings     []string          `json:"printings"`             
+	Rarity        Rarity            `json:"rarity"`                
+	Rulings       []Ruling          `json:"rulings"`               
+	Text          *string           `json:"text,omitempty"`        
+	Type          string            `json:"type"`                  
+	Types         []Type            `json:"types"`                 
+	Reserved      *bool             `json:"reserved,omitempty"`    
+	Power         *string           `json:"power,omitempty"`       
+	Subtypes      []string          `json:"subtypes"`              
+	Toughness     *string           `json:"toughness,omitempty"`   
+	ColorIdentity []ColorIdentity   `json:"colorIdentity"`         
+	Flavor        *string           `json:"flavor,omitempty"`      
+	Colors        []Color           `json:"colors"`                
+	Supertypes    []Supertype       `json:"supertypes"`            
+	Variations    []int64           `json:"variations"`            
 }
 
 type LegalityElement struct {
-	Format   Format           `json:"format"`  
-	Legality LegalityLegality `json:"legality"`
+	Format   Format       `json:"format"`  
+	Legality LegalityEnum `json:"legality"`
 }
 
 type Ruling struct {
@@ -103,44 +103,19 @@ const (
 
 type Format string
 const (
-	AmonkhetBlock Format = "Amonkhet Block"
-	BattleForZendikarBlock Format = "Battle for Zendikar Block"
+	Brawl Format = "Brawl"
 	Commander Format = "Commander"
-	IceAgeBlock Format = "Ice Age Block"
-	InnistradBlock Format = "Innistrad Block"
-	InvasionBlock Format = "Invasion Block"
-	IxalanBlock Format = "Ixalan Block"
-	KaladeshBlock Format = "Kaladesh Block"
-	KamigawaBlock Format = "Kamigawa Block"
-	KhansOfTarkirBlock Format = "Khans of Tarkir Block"
 	Legacy Format = "Legacy"
-	LorwynShadowmoorBlock Format = "Lorwyn-Shadowmoor Block"
-	MasquesBlock Format = "Masques Block"
-	MirageBlock Format = "Mirage Block"
-	MirrodinBlock Format = "Mirrodin Block"
 	Modern Format = "Modern"
-	OdysseyBlock Format = "Odyssey Block"
-	OnslaughtBlock Format = "Onslaught Block"
-	RavnicaBlock Format = "Ravnica Block"
-	ReturnToRavnicaBlock Format = "Return to Ravnica Block"
-	ScarsOfMirrodinBlock Format = "Scars of Mirrodin Block"
-	ShadowsOverInnistradBlock Format = "Shadows over Innistrad Block"
-	ShardsOfAlaraBlock Format = "Shards of Alara Block"
 	Standard Format = "Standard"
-	TempestBlock Format = "Tempest Block"
-	TherosBlock Format = "Theros Block"
-	TimeSpiralBlock Format = "Time Spiral Block"
-	UnSets Format = "Un-Sets"
-	UrzaBlock Format = "Urza Block"
 	Vintage Format = "Vintage"
-	ZendikarBlock Format = "Zendikar Block"
 )
 
-type LegalityLegality string
+type LegalityEnum string
 const (
-	Banned LegalityLegality = "Banned"
-	Legal LegalityLegality = "Legal"
-	Restricted LegalityLegality = "Restricted"
+	Banned LegalityEnum = "Banned"
+	Legal LegalityEnum = "Legal"
+	Restricted LegalityEnum = "Restricted"
 )
 
 type Rarity string

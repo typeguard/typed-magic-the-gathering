@@ -1,251 +1,7 @@
 {
+    "$schema": "http://json-schema.org/draft-06/schema#",
     "$ref": "#/definitions/LEAExtras",
     "definitions": {
-        "LegalityElement": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "format": {
-                    "type": "string",
-                    "enum": [
-                        "Commander",
-                        "Legacy",
-                        "Vintage",
-                        "Modern",
-                        "Ice Age Block",
-                        "Mirrodin Block",
-                        "Time Spiral Block",
-                        "Masques Block",
-                        "Mirage Block",
-                        "Tempest Block",
-                        "Urza Block",
-                        "Scars of Mirrodin Block",
-                        "Standard",
-                        "Odyssey Block",
-                        "Ixalan Block",
-                        "Onslaught Block",
-                        "Invasion Block",
-                        "Amonkhet Block",
-                        "Shards of Alara Block",
-                        "Ravnica Block",
-                        "Return to Ravnica Block",
-                        "Kamigawa Block",
-                        "Khans of Tarkir Block",
-                        "Battle for Zendikar Block",
-                        "Innistrad Block",
-                        "Kaladesh Block",
-                        "Lorwyn-Shadowmoor Block",
-                        "Shadows over Innistrad Block",
-                        "Theros Block",
-                        "Un-Sets",
-                        "Zendikar Block"
-                    ],
-                    "title": "format"
-                },
-                "legality": {
-                    "type": "string",
-                    "enum": [
-                        "Legal",
-                        "Banned",
-                        "Restricted"
-                    ],
-                    "title": "legality"
-                }
-            },
-            "required": [
-                "format",
-                "legality"
-            ],
-            "title": "legality"
-        },
-        "Ruling": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "date": {
-                    "type": "string",
-                    "format": "date"
-                },
-                "text": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "date",
-                "text"
-            ],
-            "title": "ruling"
-        },
-        "Card": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "artist": {
-                    "type": "string"
-                },
-                "cmc": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "imageName": {
-                    "type": "string"
-                },
-                "layout": {
-                    "type": "string",
-                    "enum": [
-                        "normal"
-                    ],
-                    "title": "layout"
-                },
-                "legalities": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/LegalityElement"
-                    }
-                },
-                "manaCost": {
-                    "type": "string"
-                },
-                "mciNumber": {
-                    "type": "string"
-                },
-                "multiverseid": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "originalText": {
-                    "type": "string"
-                },
-                "originalType": {
-                    "type": "string"
-                },
-                "printings": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "rarity": {
-                    "type": "string",
-                    "enum": [
-                        "Rare",
-                        "Uncommon",
-                        "Common",
-                        "Basic Land"
-                    ],
-                    "title": "rarity"
-                },
-                "rulings": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/Ruling"
-                    }
-                },
-                "text": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "types": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "Artifact",
-                            "Creature",
-                            "Enchantment",
-                            "Sorcery",
-                            "Instant",
-                            "Land"
-                        ],
-                        "title": "type"
-                    }
-                },
-                "reserved": {
-                    "type": "boolean"
-                },
-                "power": {
-                    "type": "string"
-                },
-                "subtypes": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "toughness": {
-                    "type": "string"
-                },
-                "colorIdentity": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "R",
-                            "G",
-                            "B",
-                            "W",
-                            "U"
-                        ],
-                        "title": "colorIdentity"
-                    }
-                },
-                "flavor": {
-                    "type": "string"
-                },
-                "colors": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "Black",
-                            "Blue",
-                            "Green",
-                            "Red",
-                            "White"
-                        ],
-                        "title": "color"
-                    }
-                },
-                "supertypes": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "Basic"
-                        ],
-                        "title": "supertype"
-                    }
-                },
-                "variations": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "required": [
-                "artist",
-                "cmc",
-                "id",
-                "imageName",
-                "layout",
-                "legalities",
-                "multiverseid",
-                "name",
-                "originalType",
-                "printings",
-                "rarity",
-                "type",
-                "types"
-            ],
-            "title": "card"
-        },
         "LEAExtras": {
             "type": "object",
             "additionalProperties": false,
@@ -275,13 +31,7 @@
                 "booster": {
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "enum": [
-                            "rare",
-                            "uncommon",
-                            "common"
-                        ],
-                        "title": "booster"
+                        "$ref": "#/definitions/Booster"
                     }
                 },
                 "mkm_name": {
@@ -311,6 +61,260 @@
                 "type"
             ],
             "title": "LEAExtras"
+        },
+        "Card": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "artist": {
+                    "type": "string"
+                },
+                "cmc": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageName": {
+                    "type": "string"
+                },
+                "layout": {
+                    "$ref": "#/definitions/Layout"
+                },
+                "legalities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/LegalityElement"
+                    }
+                },
+                "manaCost": {
+                    "type": "string"
+                },
+                "mciNumber": {
+                    "type": "string",
+                    "format": "integer"
+                },
+                "multiverseid": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "originalText": {
+                    "type": "string"
+                },
+                "originalType": {
+                    "type": "string"
+                },
+                "printings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "rarity": {
+                    "$ref": "#/definitions/Rarity"
+                },
+                "rulings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Ruling"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Type"
+                    }
+                },
+                "reserved": {
+                    "type": "boolean"
+                },
+                "power": {
+                    "type": "string"
+                },
+                "subtypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "toughness": {
+                    "type": "string"
+                },
+                "colorIdentity": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ColorIdentity"
+                    }
+                },
+                "flavor": {
+                    "type": "string"
+                },
+                "colors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Color"
+                    }
+                },
+                "supertypes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Supertype"
+                    }
+                },
+                "variations": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "required": [
+                "artist",
+                "cmc",
+                "id",
+                "imageName",
+                "layout",
+                "legalities",
+                "multiverseid",
+                "name",
+                "originalType",
+                "printings",
+                "rarity",
+                "type",
+                "types"
+            ],
+            "title": "Card"
+        },
+        "LegalityElement": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "format": {
+                    "$ref": "#/definitions/Format"
+                },
+                "legality": {
+                    "$ref": "#/definitions/LegalityEnum"
+                }
+            },
+            "required": [
+                "format",
+                "legality"
+            ],
+            "title": "LegalityElement"
+        },
+        "Ruling": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "date",
+                "text"
+            ],
+            "title": "Ruling"
+        },
+        "Booster": {
+            "type": "string",
+            "enum": [
+                "rare",
+                "uncommon",
+                "common"
+            ],
+            "title": "Booster"
+        },
+        "ColorIdentity": {
+            "type": "string",
+            "enum": [
+                "R",
+                "G",
+                "B",
+                "W",
+                "U"
+            ],
+            "title": "ColorIdentity"
+        },
+        "Color": {
+            "type": "string",
+            "enum": [
+                "Black",
+                "Blue",
+                "Green",
+                "Red",
+                "White"
+            ],
+            "title": "Color"
+        },
+        "Layout": {
+            "type": "string",
+            "enum": [
+                "normal"
+            ],
+            "title": "Layout"
+        },
+        "Format": {
+            "type": "string",
+            "enum": [
+                "Commander",
+                "Legacy",
+                "Vintage",
+                "Modern",
+                "Brawl",
+                "Standard"
+            ],
+            "title": "Format"
+        },
+        "LegalityEnum": {
+            "type": "string",
+            "enum": [
+                "Legal",
+                "Banned",
+                "Restricted"
+            ],
+            "title": "LegalityEnum"
+        },
+        "Rarity": {
+            "type": "string",
+            "enum": [
+                "Rare",
+                "Uncommon",
+                "Common",
+                "Basic Land"
+            ],
+            "title": "Rarity"
+        },
+        "Supertype": {
+            "type": "string",
+            "enum": [
+                "Basic"
+            ],
+            "title": "Supertype"
+        },
+        "Type": {
+            "type": "string",
+            "enum": [
+                "Artifact",
+                "Creature",
+                "Enchantment",
+                "Sorcery",
+                "Instant",
+                "Land"
+            ],
+            "title": "Type"
         }
     }
 }

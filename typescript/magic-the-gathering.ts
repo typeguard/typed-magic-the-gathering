@@ -79,44 +79,19 @@ export enum Layout {
 
 export interface LegalityElement {
     format:   Format;
-    legality: LegalityLegality;
+    legality: LegalityEnum;
 }
 
 export enum Format {
-    AmonkhetBlock = "Amonkhet Block",
-    BattleForZendikarBlock = "Battle for Zendikar Block",
+    Brawl = "Brawl",
     Commander = "Commander",
-    IceAgeBlock = "Ice Age Block",
-    InnistradBlock = "Innistrad Block",
-    InvasionBlock = "Invasion Block",
-    IxalanBlock = "Ixalan Block",
-    KaladeshBlock = "Kaladesh Block",
-    KamigawaBlock = "Kamigawa Block",
-    KhansOfTarkirBlock = "Khans of Tarkir Block",
     Legacy = "Legacy",
-    LorwynShadowmoorBlock = "Lorwyn-Shadowmoor Block",
-    MasquesBlock = "Masques Block",
-    MirageBlock = "Mirage Block",
-    MirrodinBlock = "Mirrodin Block",
     Modern = "Modern",
-    OdysseyBlock = "Odyssey Block",
-    OnslaughtBlock = "Onslaught Block",
-    RavnicaBlock = "Ravnica Block",
-    ReturnToRavnicaBlock = "Return to Ravnica Block",
-    ScarsOfMirrodinBlock = "Scars of Mirrodin Block",
-    ShadowsOverInnistradBlock = "Shadows over Innistrad Block",
-    ShardsOfAlaraBlock = "Shards of Alara Block",
     Standard = "Standard",
-    TempestBlock = "Tempest Block",
-    TherosBlock = "Theros Block",
-    TimeSpiralBlock = "Time Spiral Block",
-    UnSets = "Un-Sets",
-    UrzaBlock = "Urza Block",
     Vintage = "Vintage",
-    ZendikarBlock = "Zendikar Block",
 }
 
-export enum LegalityLegality {
+export enum LegalityEnum {
     Banned = "Banned",
     Legal = "Legal",
     Restricted = "Restricted",
@@ -149,143 +124,182 @@ export enum Type {
 
 // Converts JSON strings to/from your types
 // and asserts the results of JSON.parse at runtime
-export module Convert {
+export namespace Convert {
     export function toLEAExtras(json: string): LEAExtras {
-        return cast(JSON.parse(json), o("LEAExtras"));
+        return cast(JSON.parse(json), r("LEAExtras"));
     }
 
     export function lEAExtrasToJson(value: LEAExtras): string {
-        return JSON.stringify(value, null, 2);
+        return JSON.stringify(uncast(value, r("LEAExtras")), null, 2);
     }
-    
-    function cast<T>(obj: any, typ: any): T {
-        if (!isValid(typ, obj)) {
-            throw `Invalid value`;
+
+    function invalidValue(typ: any, val: any): never {
+        throw Error(`Invalid value ${JSON.stringify(val)} for type ${JSON.stringify(typ)}`);
+    }
+
+    function jsonToJSProps(typ: any): any {
+        if (typ.jsonToJS === undefined) {
+            var map: any = {};
+            typ.props.forEach((p: any) => map[p.json] = { key: p.js, typ: p.typ });
+            typ.jsonToJS = map;
         }
-        return obj;
+        return typ.jsonToJS;
     }
 
-    function isValid(typ: any, val: any): boolean {
-        if (typ === undefined) return true;
-        if (typ === null) return val === null || val === undefined;
-        return typ.isUnion  ? isValidUnion(typ.typs, val)
-                : typ.isArray  ? isValidArray(typ.typ, val)
-                : typ.isMap    ? isValidMap(typ.typ, val)
-                : typ.isEnum   ? isValidEnum(typ.name, val)
-                : typ.isObject ? isValidObject(typ.cls, val)
-                :                isValidPrimitive(typ, val);
+    function jsToJSONProps(typ: any): any {
+        if (typ.jsToJSON === undefined) {
+            var map: any = {};
+            typ.props.forEach((p: any) => map[p.js] = { key: p.json, typ: p.typ });
+            typ.jsToJSON = map;
+        }
+        return typ.jsToJSON;
     }
 
-    function isValidPrimitive(typ: string, val: any) {
-        return typeof typ === typeof val;
+    function transform(val: any, typ: any, getProps: any): any {
+        function transformPrimitive(typ: string, val: any): any {
+            if (typeof typ === typeof val) return val;
+            return invalidValue(typ, val);
+        }
+
+        function transformUnion(typs: any[], val: any): any {
+            // val must validate against one typ in typs
+            var l = typs.length;
+            for (var i = 0; i < l; i++) {
+                var typ = typs[i];
+                try {
+                    return transform(val, typ, getProps);
+                } catch (_) {}
+            }
+            return invalidValue(typs, val);
+        }
+
+        function transformEnum(cases: string[], val: any): any {
+            if (cases.indexOf(val) !== -1) return val;
+            return invalidValue(cases, val);
+        }
+
+        function transformArray(typ: any, val: any): any {
+            // val must be an array with no invalid elements
+            if (!Array.isArray(val)) return invalidValue("array", val);
+            return val.map(el => transform(el, typ, getProps));
+        }
+
+        function transformObject(props: { [k: string]: any }, additional: any, val: any): any {
+            if (val === null || typeof val !== "object" || Array.isArray(val)) {
+                return invalidValue("object", val);
+            }
+            var result: any = {};
+            Object.getOwnPropertyNames(props).forEach(key => {
+                const prop = props[key];
+                const v = Object.prototype.hasOwnProperty.call(val, key) ? val[key] : undefined;
+                result[prop.key] = transform(v, prop.typ, getProps);
+            });
+            Object.getOwnPropertyNames(val).forEach(key => {
+                if (!Object.prototype.hasOwnProperty.call(props, key)) {
+                    result[key] = transform(val[key], additional, getProps);
+                }
+            });
+            return result;
+        }
+
+        if (typ === "any") return val;
+        if (typ === null) {
+            if (val === null) return val;
+            return invalidValue(typ, val);
+        }
+        if (typ === false) return invalidValue(typ, val);
+        while (typeof typ === "object" && typ.ref !== undefined) {
+            typ = typeMap[typ.ref];
+        }
+        if (Array.isArray(typ)) return transformEnum(typ, val);
+        if (typeof typ === "object") {
+            return typ.hasOwnProperty("unionMembers") ? transformUnion(typ.unionMembers, val)
+                : typ.hasOwnProperty("arrayItems")    ? transformArray(typ.arrayItems, val)
+                : typ.hasOwnProperty("props")         ? transformObject(getProps(typ), typ.additional, val)
+                : invalidValue(typ, val);
+        }
+        return transformPrimitive(typ, val);
     }
 
-    function isValidUnion(typs: any[], val: any): boolean {
-        // val must validate against one typ in typs
-        return typs.find(typ => isValid(typ, val)) !== undefined;
+    function cast<T>(val: any, typ: any): T {
+        return transform(val, typ, jsonToJSProps);
     }
 
-    function isValidEnum(enumName: string, val: any): boolean {
-        const cases = typeMap[enumName];
-        return cases.indexOf(val) !== -1;
-    }
-
-    function isValidArray(typ: any, val: any): boolean {
-        // val must be an array with no invalid elements
-        return Array.isArray(val) && val.every(element => {
-            return isValid(typ, element);
-        });
-    }
-
-    function isValidMap(typ: any, val: any): boolean {
-        if (val === null || typeof val !== "object" || Array.isArray(val)) return false;
-        // all values in the map must be typ
-        return Object.keys(val).every(prop => {
-            if (!Object.prototype.hasOwnProperty.call(val, prop)) return true;
-            return isValid(typ, val[prop]);
-        });
-    }
-
-    function isValidObject(className: string, val: any): boolean {
-        if (val === null || typeof val !== "object" || Array.isArray(val)) return false;
-        let typeRep = typeMap[className];
-        return Object.keys(typeRep).every(prop => {
-            if (!Object.prototype.hasOwnProperty.call(typeRep, prop)) return true;
-            return isValid(typeRep[prop], val[prop]);
-        });
+    function uncast<T>(val: T, typ: any): any {
+        return transform(val, typ, jsToJSONProps);
     }
 
     function a(typ: any) {
-        return { typ, isArray: true };
-    }
-
-    function e(name: string) {
-        return { name, isEnum: true };
+        return { arrayItems: typ };
     }
 
     function u(...typs: any[]) {
-        return { typs, isUnion: true };
+        return { unionMembers: typs };
     }
 
-    function m(typ: any) {
-        return { typ, isMap: true };
+    function o(props: any[], additional: any) {
+        return { props, additional };
     }
 
-    function o(className: string) {
-        return { cls: className, isObject: true };
+    function m(additional: any) {
+        return { props: [], additional };
+    }
+
+    function r(name: string) {
+        return { ref: name };
     }
 
     const typeMap: any = {
-        "LEAExtras": {
-            name: "",
-            code: "",
-            gathererCode: "",
-            magicCardsInfoCode: "",
-            releaseDate: "",
-            border: "",
-            type: "",
-            booster: a(e("Booster")),
-            mkm_name: "",
-            mkm_id: 0,
-            cards: a(o("Card")),
-        },
-        "Card": {
-            artist: "",
-            cmc: 0,
-            id: "",
-            imageName: "",
-            layout: e("Layout"),
-            legalities: a(o("LegalityElement")),
-            manaCost: u(null, ""),
-            mciNumber: u(null, ""),
-            multiverseid: 0,
-            name: "",
-            originalText: u(null, ""),
-            originalType: "",
-            printings: a(""),
-            rarity: e("Rarity"),
-            rulings: u(null, a(o("Ruling"))),
-            text: u(null, ""),
-            type: "",
-            types: a(e("Type")),
-            reserved: u(null, false),
-            power: u(null, ""),
-            subtypes: u(null, a("")),
-            toughness: u(null, ""),
-            colorIdentity: u(null, a(e("ColorIdentity"))),
-            flavor: u(null, ""),
-            colors: u(null, a(e("Color"))),
-            supertypes: u(null, a(e("Supertype"))),
-            variations: u(null, a(0)),
-        },
-        "LegalityElement": {
-            format: e("Format"),
-            legality: e("LegalityLegality"),
-        },
-        "Ruling": {
-            date: "",
-            text: "",
-        },
+        "LEAExtras": o([
+            { json: "name", js: "name", typ: "" },
+            { json: "code", js: "code", typ: "" },
+            { json: "gathererCode", js: "gathererCode", typ: "" },
+            { json: "magicCardsInfoCode", js: "magicCardsInfoCode", typ: "" },
+            { json: "releaseDate", js: "releaseDate", typ: "" },
+            { json: "border", js: "border", typ: "" },
+            { json: "type", js: "type", typ: "" },
+            { json: "booster", js: "booster", typ: a(r("Booster")) },
+            { json: "mkm_name", js: "mkm_name", typ: "" },
+            { json: "mkm_id", js: "mkm_id", typ: 0 },
+            { json: "cards", js: "cards", typ: a(r("Card")) },
+        ], false),
+        "Card": o([
+            { json: "artist", js: "artist", typ: "" },
+            { json: "cmc", js: "cmc", typ: 0 },
+            { json: "id", js: "id", typ: "" },
+            { json: "imageName", js: "imageName", typ: "" },
+            { json: "layout", js: "layout", typ: r("Layout") },
+            { json: "legalities", js: "legalities", typ: a(r("LegalityElement")) },
+            { json: "manaCost", js: "manaCost", typ: u(undefined, "") },
+            { json: "mciNumber", js: "mciNumber", typ: u(undefined, "") },
+            { json: "multiverseid", js: "multiverseid", typ: 0 },
+            { json: "name", js: "name", typ: "" },
+            { json: "originalText", js: "originalText", typ: u(undefined, "") },
+            { json: "originalType", js: "originalType", typ: "" },
+            { json: "printings", js: "printings", typ: a("") },
+            { json: "rarity", js: "rarity", typ: r("Rarity") },
+            { json: "rulings", js: "rulings", typ: u(undefined, a(r("Ruling"))) },
+            { json: "text", js: "text", typ: u(undefined, "") },
+            { json: "type", js: "type", typ: "" },
+            { json: "types", js: "types", typ: a(r("Type")) },
+            { json: "reserved", js: "reserved", typ: u(undefined, true) },
+            { json: "power", js: "power", typ: u(undefined, "") },
+            { json: "subtypes", js: "subtypes", typ: u(undefined, a("")) },
+            { json: "toughness", js: "toughness", typ: u(undefined, "") },
+            { json: "colorIdentity", js: "colorIdentity", typ: u(undefined, a(r("ColorIdentity"))) },
+            { json: "flavor", js: "flavor", typ: u(undefined, "") },
+            { json: "colors", js: "colors", typ: u(undefined, a(r("Color"))) },
+            { json: "supertypes", js: "supertypes", typ: u(undefined, a(r("Supertype"))) },
+            { json: "variations", js: "variations", typ: u(undefined, a(0)) },
+        ], false),
+        "LegalityElement": o([
+            { json: "format", js: "format", typ: r("Format") },
+            { json: "legality", js: "legality", typ: r("LegalityEnum") },
+        ], false),
+        "Ruling": o([
+            { json: "date", js: "date", typ: "" },
+            { json: "text", js: "text", typ: "" },
+        ], false),
         "Booster": [
             "common",
             "rare",
@@ -309,39 +323,14 @@ export module Convert {
             "normal",
         ],
         "Format": [
-            "Amonkhet Block",
-            "Battle for Zendikar Block",
+            "Brawl",
             "Commander",
-            "Ice Age Block",
-            "Innistrad Block",
-            "Invasion Block",
-            "Ixalan Block",
-            "Kaladesh Block",
-            "Kamigawa Block",
-            "Khans of Tarkir Block",
             "Legacy",
-            "Lorwyn-Shadowmoor Block",
-            "Masques Block",
-            "Mirage Block",
-            "Mirrodin Block",
             "Modern",
-            "Odyssey Block",
-            "Onslaught Block",
-            "Ravnica Block",
-            "Return to Ravnica Block",
-            "Scars of Mirrodin Block",
-            "Shadows over Innistrad Block",
-            "Shards of Alara Block",
             "Standard",
-            "Tempest Block",
-            "Theros Block",
-            "Time Spiral Block",
-            "Un-Sets",
-            "Urza Block",
             "Vintage",
-            "Zendikar Block",
         ],
-        "LegalityLegality": [
+        "LegalityEnum": [
             "Banned",
             "Legal",
             "Restricted",

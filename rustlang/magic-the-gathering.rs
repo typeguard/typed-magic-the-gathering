@@ -3,12 +3,12 @@
 // #[macro_use]
 // extern crate serde_derive;
 // extern crate serde_json;
-// 
-// use generated_module::LEAExtras;
-// 
+//
+// use generated_module::[object Object];
+//
 // fn main() {
 //     let json = r#"{"answer": 42}"#;
-//     let model: LEAExtras = serde_json::from_str(&json).unwrap();
+//     let model: [object Object] = serde_json::from_str(&json).unwrap();
 // }
 
 extern crate serde_json;
@@ -139,7 +139,7 @@ pub struct LegalityElement {
     format: Format,
 
     #[serde(rename = "legality")]
-    legality: LegalityLegality,
+    legality: LegalityEnum,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -207,102 +207,27 @@ pub enum Layout {
 
 #[derive(Serialize, Deserialize)]
 pub enum Format {
-    #[serde(rename = "Amonkhet Block")]
-    AmonkhetBlock,
-
-    #[serde(rename = "Battle for Zendikar Block")]
-    BattleForZendikarBlock,
+    #[serde(rename = "Brawl")]
+    Brawl,
 
     #[serde(rename = "Commander")]
     Commander,
 
-    #[serde(rename = "Ice Age Block")]
-    IceAgeBlock,
-
-    #[serde(rename = "Innistrad Block")]
-    InnistradBlock,
-
-    #[serde(rename = "Invasion Block")]
-    InvasionBlock,
-
-    #[serde(rename = "Ixalan Block")]
-    IxalanBlock,
-
-    #[serde(rename = "Kaladesh Block")]
-    KaladeshBlock,
-
-    #[serde(rename = "Kamigawa Block")]
-    KamigawaBlock,
-
-    #[serde(rename = "Khans of Tarkir Block")]
-    KhansOfTarkirBlock,
-
     #[serde(rename = "Legacy")]
     Legacy,
-
-    #[serde(rename = "Lorwyn-Shadowmoor Block")]
-    LorwynShadowmoorBlock,
-
-    #[serde(rename = "Masques Block")]
-    MasquesBlock,
-
-    #[serde(rename = "Mirage Block")]
-    MirageBlock,
-
-    #[serde(rename = "Mirrodin Block")]
-    MirrodinBlock,
 
     #[serde(rename = "Modern")]
     Modern,
 
-    #[serde(rename = "Odyssey Block")]
-    OdysseyBlock,
-
-    #[serde(rename = "Onslaught Block")]
-    OnslaughtBlock,
-
-    #[serde(rename = "Ravnica Block")]
-    RavnicaBlock,
-
-    #[serde(rename = "Return to Ravnica Block")]
-    ReturnToRavnicaBlock,
-
-    #[serde(rename = "Scars of Mirrodin Block")]
-    ScarsOfMirrodinBlock,
-
-    #[serde(rename = "Shadows over Innistrad Block")]
-    ShadowsOverInnistradBlock,
-
-    #[serde(rename = "Shards of Alara Block")]
-    ShardsOfAlaraBlock,
-
     #[serde(rename = "Standard")]
     Standard,
 
-    #[serde(rename = "Tempest Block")]
-    TempestBlock,
-
-    #[serde(rename = "Theros Block")]
-    TherosBlock,
-
-    #[serde(rename = "Time Spiral Block")]
-    TimeSpiralBlock,
-
-    #[serde(rename = "Un-Sets")]
-    UnSets,
-
-    #[serde(rename = "Urza Block")]
-    UrzaBlock,
-
     #[serde(rename = "Vintage")]
     Vintage,
-
-    #[serde(rename = "Zendikar Block")]
-    ZendikarBlock,
 }
 
 #[derive(Serialize, Deserialize)]
-pub enum LegalityLegality {
+pub enum LegalityEnum {
     #[serde(rename = "Banned")]
     Banned,
 

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.io.IOException;
 import com.fasterxml.jackson.annotation.*;
 
-public enum LegalityLegality {
+public enum LegalityEnum {
     BANNED, LEGAL, RESTRICTED;
 
     @JsonValue
@@ -18,10 +18,10 @@ public enum LegalityLegality {
     }
 
     @JsonCreator
-    public static LegalityLegality forValue(String value) throws IOException {
+    public static LegalityEnum forValue(String value) throws IOException {
         if (value.equals("Banned")) return BANNED;
         if (value.equals("Legal")) return LEGAL;
         if (value.equals("Restricted")) return RESTRICTED;
-        throw new IOException("Cannot deserialize LegalityLegality");
+        throw new IOException("Cannot deserialize LegalityEnum");
     }
 }

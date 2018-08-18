@@ -153,71 +153,21 @@ NS_ASSUME_NONNULL_BEGIN
 {
     static NSDictionary<NSString *, LEAFormat *> *values;
     return values = values ? values : @{
-        @"Amonkhet Block": [[LEAFormat alloc] initWithValue:@"Amonkhet Block"],
-        @"Battle for Zendikar Block": [[LEAFormat alloc] initWithValue:@"Battle for Zendikar Block"],
+        @"Brawl": [[LEAFormat alloc] initWithValue:@"Brawl"],
         @"Commander": [[LEAFormat alloc] initWithValue:@"Commander"],
-        @"Ice Age Block": [[LEAFormat alloc] initWithValue:@"Ice Age Block"],
-        @"Innistrad Block": [[LEAFormat alloc] initWithValue:@"Innistrad Block"],
-        @"Invasion Block": [[LEAFormat alloc] initWithValue:@"Invasion Block"],
-        @"Ixalan Block": [[LEAFormat alloc] initWithValue:@"Ixalan Block"],
-        @"Kaladesh Block": [[LEAFormat alloc] initWithValue:@"Kaladesh Block"],
-        @"Kamigawa Block": [[LEAFormat alloc] initWithValue:@"Kamigawa Block"],
-        @"Khans of Tarkir Block": [[LEAFormat alloc] initWithValue:@"Khans of Tarkir Block"],
         @"Legacy": [[LEAFormat alloc] initWithValue:@"Legacy"],
-        @"Lorwyn-Shadowmoor Block": [[LEAFormat alloc] initWithValue:@"Lorwyn-Shadowmoor Block"],
-        @"Masques Block": [[LEAFormat alloc] initWithValue:@"Masques Block"],
-        @"Mirage Block": [[LEAFormat alloc] initWithValue:@"Mirage Block"],
-        @"Mirrodin Block": [[LEAFormat alloc] initWithValue:@"Mirrodin Block"],
         @"Modern": [[LEAFormat alloc] initWithValue:@"Modern"],
-        @"Odyssey Block": [[LEAFormat alloc] initWithValue:@"Odyssey Block"],
-        @"Onslaught Block": [[LEAFormat alloc] initWithValue:@"Onslaught Block"],
-        @"Ravnica Block": [[LEAFormat alloc] initWithValue:@"Ravnica Block"],
-        @"Return to Ravnica Block": [[LEAFormat alloc] initWithValue:@"Return to Ravnica Block"],
-        @"Scars of Mirrodin Block": [[LEAFormat alloc] initWithValue:@"Scars of Mirrodin Block"],
-        @"Shadows over Innistrad Block": [[LEAFormat alloc] initWithValue:@"Shadows over Innistrad Block"],
-        @"Shards of Alara Block": [[LEAFormat alloc] initWithValue:@"Shards of Alara Block"],
         @"Standard": [[LEAFormat alloc] initWithValue:@"Standard"],
-        @"Tempest Block": [[LEAFormat alloc] initWithValue:@"Tempest Block"],
-        @"Theros Block": [[LEAFormat alloc] initWithValue:@"Theros Block"],
-        @"Time Spiral Block": [[LEAFormat alloc] initWithValue:@"Time Spiral Block"],
-        @"Un-Sets": [[LEAFormat alloc] initWithValue:@"Un-Sets"],
-        @"Urza Block": [[LEAFormat alloc] initWithValue:@"Urza Block"],
         @"Vintage": [[LEAFormat alloc] initWithValue:@"Vintage"],
-        @"Zendikar Block": [[LEAFormat alloc] initWithValue:@"Zendikar Block"],
     };
 }
 
-+ (LEAFormat *)amonkhetBlock { return LEAFormat.values[@"Amonkhet Block"]; }
-+ (LEAFormat *)battleForZendikarBlock { return LEAFormat.values[@"Battle for Zendikar Block"]; }
++ (LEAFormat *)brawl { return LEAFormat.values[@"Brawl"]; }
 + (LEAFormat *)commander { return LEAFormat.values[@"Commander"]; }
-+ (LEAFormat *)iceAgeBlock { return LEAFormat.values[@"Ice Age Block"]; }
-+ (LEAFormat *)innistradBlock { return LEAFormat.values[@"Innistrad Block"]; }
-+ (LEAFormat *)invasionBlock { return LEAFormat.values[@"Invasion Block"]; }
-+ (LEAFormat *)ixalanBlock { return LEAFormat.values[@"Ixalan Block"]; }
-+ (LEAFormat *)kaladeshBlock { return LEAFormat.values[@"Kaladesh Block"]; }
-+ (LEAFormat *)kamigawaBlock { return LEAFormat.values[@"Kamigawa Block"]; }
-+ (LEAFormat *)khansOfTarkirBlock { return LEAFormat.values[@"Khans of Tarkir Block"]; }
 + (LEAFormat *)legacy { return LEAFormat.values[@"Legacy"]; }
-+ (LEAFormat *)lorwynShadowmoorBlock { return LEAFormat.values[@"Lorwyn-Shadowmoor Block"]; }
-+ (LEAFormat *)masquesBlock { return LEAFormat.values[@"Masques Block"]; }
-+ (LEAFormat *)mirageBlock { return LEAFormat.values[@"Mirage Block"]; }
-+ (LEAFormat *)mirrodinBlock { return LEAFormat.values[@"Mirrodin Block"]; }
 + (LEAFormat *)modern { return LEAFormat.values[@"Modern"]; }
-+ (LEAFormat *)odysseyBlock { return LEAFormat.values[@"Odyssey Block"]; }
-+ (LEAFormat *)onslaughtBlock { return LEAFormat.values[@"Onslaught Block"]; }
-+ (LEAFormat *)ravnicaBlock { return LEAFormat.values[@"Ravnica Block"]; }
-+ (LEAFormat *)returnToRavnicaBlock { return LEAFormat.values[@"Return to Ravnica Block"]; }
-+ (LEAFormat *)scarsOfMirrodinBlock { return LEAFormat.values[@"Scars of Mirrodin Block"]; }
-+ (LEAFormat *)shadowsOverInnistradBlock { return LEAFormat.values[@"Shadows over Innistrad Block"]; }
-+ (LEAFormat *)shardsOfAlaraBlock { return LEAFormat.values[@"Shards of Alara Block"]; }
 + (LEAFormat *)standard { return LEAFormat.values[@"Standard"]; }
-+ (LEAFormat *)tempestBlock { return LEAFormat.values[@"Tempest Block"]; }
-+ (LEAFormat *)therosBlock { return LEAFormat.values[@"Theros Block"]; }
-+ (LEAFormat *)timeSpiralBlock { return LEAFormat.values[@"Time Spiral Block"]; }
-+ (LEAFormat *)unSets { return LEAFormat.values[@"Un-Sets"]; }
-+ (LEAFormat *)urzaBlock { return LEAFormat.values[@"Urza Block"]; }
 + (LEAFormat *)vintage { return LEAFormat.values[@"Vintage"]; }
-+ (LEAFormat *)zendikarBlock { return LEAFormat.values[@"Zendikar Block"]; }
 
 + (instancetype _Nullable)withValue:(NSString *)value
 {
@@ -233,24 +183,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)hash { return _value.hash; }
 @end
 
-@implementation LEALegalityLegality
-+ (NSDictionary<NSString *, LEALegalityLegality *> *)values
+@implementation LEALegalityEnum
++ (NSDictionary<NSString *, LEALegalityEnum *> *)values
 {
-    static NSDictionary<NSString *, LEALegalityLegality *> *values;
+    static NSDictionary<NSString *, LEALegalityEnum *> *values;
     return values = values ? values : @{
-        @"Banned": [[LEALegalityLegality alloc] initWithValue:@"Banned"],
-        @"Legal": [[LEALegalityLegality alloc] initWithValue:@"Legal"],
-        @"Restricted": [[LEALegalityLegality alloc] initWithValue:@"Restricted"],
+        @"Banned": [[LEALegalityEnum alloc] initWithValue:@"Banned"],
+        @"Legal": [[LEALegalityEnum alloc] initWithValue:@"Legal"],
+        @"Restricted": [[LEALegalityEnum alloc] initWithValue:@"Restricted"],
     };
 }
 
-+ (LEALegalityLegality *)banned { return LEALegalityLegality.values[@"Banned"]; }
-+ (LEALegalityLegality *)legal { return LEALegalityLegality.values[@"Legal"]; }
-+ (LEALegalityLegality *)restricted { return LEALegalityLegality.values[@"Restricted"]; }
++ (LEALegalityEnum *)banned { return LEALegalityEnum.values[@"Banned"]; }
++ (LEALegalityEnum *)legal { return LEALegalityEnum.values[@"Legal"]; }
++ (LEALegalityEnum *)restricted { return LEALegalityEnum.values[@"Restricted"]; }
 
 + (instancetype _Nullable)withValue:(NSString *)value
 {
-    return LEALegalityLegality.values[value];
+    return LEALegalityEnum.values[value];
 }
 
 - (instancetype)initWithValue:(NSString *)value
@@ -447,7 +397,8 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
 
 - (void)setValue:(nullable id)value forKey:(NSString *)key
 {
-    [super setValue:value forKey:LEAExtras.properties[key]];
+    id resolved = LEAExtras.properties[key];
+    if (resolved) [super setValue:value forKey:resolved];
 }
 
 - (NSDictionary *)JSONDictionary
@@ -539,7 +490,8 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
 
 - (void)setValue:(nullable id)value forKey:(NSString *)key
 {
-    [super setValue:value forKey:LEACard.properties[key]];
+    id resolved = LEACard.properties[key];
+    if (resolved) [super setValue:value forKey:resolved];
 }
 
 - (NSDictionary *)JSONDictionary
@@ -589,7 +541,7 @@ NSString *_Nullable LEAExtrasToJSON(LEAExtras *extras, NSStringEncoding encoding
     if (self = [super init]) {
         [self setValuesForKeysWithDictionary:dict];
         _format = [LEAFormat withValue:(id)_format];
-        _legality = [LEALegalityLegality withValue:(id)_legality];
+        _legality = [LEALegalityEnum withValue:(id)_legality];
     }
     return self;
 }

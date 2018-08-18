@@ -8,7 +8,6 @@ namespace QuickType
 {
     using System;
     using System.Collections.Generic;
-    using System.Net;
 
     using System.Globalization;
     using Newtonsoft.Json;
@@ -29,7 +28,7 @@ namespace QuickType
         public string MagicCardsInfoCode { get; set; }
 
         [JsonProperty("releaseDate")]
-        public System.DateTimeOffset ReleaseDate { get; set; }
+        public DateTimeOffset ReleaseDate { get; set; }
 
         [JsonProperty("border")]
         public string Border { get; set; }
@@ -70,11 +69,12 @@ namespace QuickType
         [JsonProperty("legalities")]
         public LegalityElement[] Legalities { get; set; }
 
-        [JsonProperty("manaCost")]
+        [JsonProperty("manaCost", NullValueHandling = NullValueHandling.Ignore)]
         public string ManaCost { get; set; }
 
-        [JsonProperty("mciNumber")]
-        public string MciNumber { get; set; }
+        [JsonProperty("mciNumber", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(ParseStringConverter))]
+        public long? MciNumber { get; set; }
 
         [JsonProperty("multiverseid")]
         public long Multiverseid { get; set; }
@@ -82,7 +82,7 @@ namespace QuickType
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("originalText")]
+        [JsonProperty("originalText", NullValueHandling = NullValueHandling.Ignore)]
         public string OriginalText { get; set; }
 
         [JsonProperty("originalType")]
@@ -94,10 +94,10 @@ namespace QuickType
         [JsonProperty("rarity")]
         public Rarity Rarity { get; set; }
 
-        [JsonProperty("rulings")]
+        [JsonProperty("rulings", NullValueHandling = NullValueHandling.Ignore)]
         public Ruling[] Rulings { get; set; }
 
-        [JsonProperty("text")]
+        [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
         public string Text { get; set; }
 
         [JsonProperty("type")]
@@ -106,31 +106,31 @@ namespace QuickType
         [JsonProperty("types")]
         public TypeElement[] Types { get; set; }
 
-        [JsonProperty("reserved")]
+        [JsonProperty("reserved", NullValueHandling = NullValueHandling.Ignore)]
         public bool? Reserved { get; set; }
 
-        [JsonProperty("power")]
+        [JsonProperty("power", NullValueHandling = NullValueHandling.Ignore)]
         public string Power { get; set; }
 
-        [JsonProperty("subtypes")]
+        [JsonProperty("subtypes", NullValueHandling = NullValueHandling.Ignore)]
         public string[] Subtypes { get; set; }
 
-        [JsonProperty("toughness")]
+        [JsonProperty("toughness", NullValueHandling = NullValueHandling.Ignore)]
         public string Toughness { get; set; }
 
-        [JsonProperty("colorIdentity")]
+        [JsonProperty("colorIdentity", NullValueHandling = NullValueHandling.Ignore)]
         public ColorIdentity[] ColorIdentity { get; set; }
 
-        [JsonProperty("flavor")]
+        [JsonProperty("flavor", NullValueHandling = NullValueHandling.Ignore)]
         public string Flavor { get; set; }
 
-        [JsonProperty("colors")]
+        [JsonProperty("colors", NullValueHandling = NullValueHandling.Ignore)]
         public Color[] Colors { get; set; }
 
-        [JsonProperty("supertypes")]
+        [JsonProperty("supertypes", NullValueHandling = NullValueHandling.Ignore)]
         public Supertype[] Supertypes { get; set; }
 
-        [JsonProperty("variations")]
+        [JsonProperty("variations", NullValueHandling = NullValueHandling.Ignore)]
         public long[] Variations { get; set; }
     }
 
@@ -140,13 +140,13 @@ namespace QuickType
         public Format Format { get; set; }
 
         [JsonProperty("legality")]
-        public LegalityLegality Legality { get; set; }
+        public LegalityEnum Legality { get; set; }
     }
 
     public partial class Ruling
     {
         [JsonProperty("date")]
-        public System.DateTimeOffset Date { get; set; }
+        public DateTimeOffset Date { get; set; }
 
         [JsonProperty("text")]
         public string Text { get; set; }
@@ -160,9 +160,9 @@ namespace QuickType
 
     public enum Layout { Normal };
 
-    public enum Format { AmonkhetBlock, BattleForZendikarBlock, Commander, IceAgeBlock, InnistradBlock, InvasionBlock, IxalanBlock, KaladeshBlock, KamigawaBlock, KhansOfTarkirBlock, Legacy, LorwynShadowmoorBlock, MasquesBlock, MirageBlock, MirrodinBlock, Modern, OdysseyBlock, OnslaughtBlock, RavnicaBlock, ReturnToRavnicaBlock, ScarsOfMirrodinBlock, ShadowsOverInnistradBlock, ShardsOfAlaraBlock, Standard, TempestBlock, TherosBlock, TimeSpiralBlock, UnSets, UrzaBlock, Vintage, ZendikarBlock };
+    public enum Format { Brawl, Commander, Legacy, Modern, Standard, Vintage };
 
-    public enum LegalityLegality { Banned, Legal, Restricted };
+    public enum LegalityEnum { Banned, Legal, Restricted };
 
     public enum Rarity { BasicLand, Common, Rare, Uncommon };
 
@@ -175,497 +175,505 @@ namespace QuickType
         public static LeaExtras FromJson(string json) => JsonConvert.DeserializeObject<LeaExtras>(json, QuickType.Converter.Settings);
     }
 
-    static class BoosterExtensions
-    {
-        public static Booster? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "common": return Booster.Common;
-                case "rare": return Booster.Rare;
-                case "uncommon": return Booster.Uncommon;
-                default: return null;
-            }
-        }
-
-        public static Booster ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this Booster value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case Booster.Common: serializer.Serialize(writer, "common"); break;
-                case Booster.Rare: serializer.Serialize(writer, "rare"); break;
-                case Booster.Uncommon: serializer.Serialize(writer, "uncommon"); break;
-            }
-        }
-    }
-
-    static class ColorIdentityExtensions
-    {
-        public static ColorIdentity? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "B": return ColorIdentity.B;
-                case "G": return ColorIdentity.G;
-                case "R": return ColorIdentity.R;
-                case "U": return ColorIdentity.U;
-                case "W": return ColorIdentity.W;
-                default: return null;
-            }
-        }
-
-        public static ColorIdentity ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this ColorIdentity value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case ColorIdentity.B: serializer.Serialize(writer, "B"); break;
-                case ColorIdentity.G: serializer.Serialize(writer, "G"); break;
-                case ColorIdentity.R: serializer.Serialize(writer, "R"); break;
-                case ColorIdentity.U: serializer.Serialize(writer, "U"); break;
-                case ColorIdentity.W: serializer.Serialize(writer, "W"); break;
-            }
-        }
-    }
-
-    static class ColorExtensions
-    {
-        public static Color? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "Black": return Color.Black;
-                case "Blue": return Color.Blue;
-                case "Green": return Color.Green;
-                case "Red": return Color.Red;
-                case "White": return Color.White;
-                default: return null;
-            }
-        }
-
-        public static Color ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this Color value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case Color.Black: serializer.Serialize(writer, "Black"); break;
-                case Color.Blue: serializer.Serialize(writer, "Blue"); break;
-                case Color.Green: serializer.Serialize(writer, "Green"); break;
-                case Color.Red: serializer.Serialize(writer, "Red"); break;
-                case Color.White: serializer.Serialize(writer, "White"); break;
-            }
-        }
-    }
-
-    static class LayoutExtensions
-    {
-        public static Layout? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "normal": return Layout.Normal;
-                default: return null;
-            }
-        }
-
-        public static Layout ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this Layout value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case Layout.Normal: serializer.Serialize(writer, "normal"); break;
-            }
-        }
-    }
-
-    static class FormatExtensions
-    {
-        public static Format? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "Amonkhet Block": return Format.AmonkhetBlock;
-                case "Battle for Zendikar Block": return Format.BattleForZendikarBlock;
-                case "Commander": return Format.Commander;
-                case "Ice Age Block": return Format.IceAgeBlock;
-                case "Innistrad Block": return Format.InnistradBlock;
-                case "Invasion Block": return Format.InvasionBlock;
-                case "Ixalan Block": return Format.IxalanBlock;
-                case "Kaladesh Block": return Format.KaladeshBlock;
-                case "Kamigawa Block": return Format.KamigawaBlock;
-                case "Khans of Tarkir Block": return Format.KhansOfTarkirBlock;
-                case "Legacy": return Format.Legacy;
-                case "Lorwyn-Shadowmoor Block": return Format.LorwynShadowmoorBlock;
-                case "Masques Block": return Format.MasquesBlock;
-                case "Mirage Block": return Format.MirageBlock;
-                case "Mirrodin Block": return Format.MirrodinBlock;
-                case "Modern": return Format.Modern;
-                case "Odyssey Block": return Format.OdysseyBlock;
-                case "Onslaught Block": return Format.OnslaughtBlock;
-                case "Ravnica Block": return Format.RavnicaBlock;
-                case "Return to Ravnica Block": return Format.ReturnToRavnicaBlock;
-                case "Scars of Mirrodin Block": return Format.ScarsOfMirrodinBlock;
-                case "Shadows over Innistrad Block": return Format.ShadowsOverInnistradBlock;
-                case "Shards of Alara Block": return Format.ShardsOfAlaraBlock;
-                case "Standard": return Format.Standard;
-                case "Tempest Block": return Format.TempestBlock;
-                case "Theros Block": return Format.TherosBlock;
-                case "Time Spiral Block": return Format.TimeSpiralBlock;
-                case "Un-Sets": return Format.UnSets;
-                case "Urza Block": return Format.UrzaBlock;
-                case "Vintage": return Format.Vintage;
-                case "Zendikar Block": return Format.ZendikarBlock;
-                default: return null;
-            }
-        }
-
-        public static Format ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this Format value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case Format.AmonkhetBlock: serializer.Serialize(writer, "Amonkhet Block"); break;
-                case Format.BattleForZendikarBlock: serializer.Serialize(writer, "Battle for Zendikar Block"); break;
-                case Format.Commander: serializer.Serialize(writer, "Commander"); break;
-                case Format.IceAgeBlock: serializer.Serialize(writer, "Ice Age Block"); break;
-                case Format.InnistradBlock: serializer.Serialize(writer, "Innistrad Block"); break;
-                case Format.InvasionBlock: serializer.Serialize(writer, "Invasion Block"); break;
-                case Format.IxalanBlock: serializer.Serialize(writer, "Ixalan Block"); break;
-                case Format.KaladeshBlock: serializer.Serialize(writer, "Kaladesh Block"); break;
-                case Format.KamigawaBlock: serializer.Serialize(writer, "Kamigawa Block"); break;
-                case Format.KhansOfTarkirBlock: serializer.Serialize(writer, "Khans of Tarkir Block"); break;
-                case Format.Legacy: serializer.Serialize(writer, "Legacy"); break;
-                case Format.LorwynShadowmoorBlock: serializer.Serialize(writer, "Lorwyn-Shadowmoor Block"); break;
-                case Format.MasquesBlock: serializer.Serialize(writer, "Masques Block"); break;
-                case Format.MirageBlock: serializer.Serialize(writer, "Mirage Block"); break;
-                case Format.MirrodinBlock: serializer.Serialize(writer, "Mirrodin Block"); break;
-                case Format.Modern: serializer.Serialize(writer, "Modern"); break;
-                case Format.OdysseyBlock: serializer.Serialize(writer, "Odyssey Block"); break;
-                case Format.OnslaughtBlock: serializer.Serialize(writer, "Onslaught Block"); break;
-                case Format.RavnicaBlock: serializer.Serialize(writer, "Ravnica Block"); break;
-                case Format.ReturnToRavnicaBlock: serializer.Serialize(writer, "Return to Ravnica Block"); break;
-                case Format.ScarsOfMirrodinBlock: serializer.Serialize(writer, "Scars of Mirrodin Block"); break;
-                case Format.ShadowsOverInnistradBlock: serializer.Serialize(writer, "Shadows over Innistrad Block"); break;
-                case Format.ShardsOfAlaraBlock: serializer.Serialize(writer, "Shards of Alara Block"); break;
-                case Format.Standard: serializer.Serialize(writer, "Standard"); break;
-                case Format.TempestBlock: serializer.Serialize(writer, "Tempest Block"); break;
-                case Format.TherosBlock: serializer.Serialize(writer, "Theros Block"); break;
-                case Format.TimeSpiralBlock: serializer.Serialize(writer, "Time Spiral Block"); break;
-                case Format.UnSets: serializer.Serialize(writer, "Un-Sets"); break;
-                case Format.UrzaBlock: serializer.Serialize(writer, "Urza Block"); break;
-                case Format.Vintage: serializer.Serialize(writer, "Vintage"); break;
-                case Format.ZendikarBlock: serializer.Serialize(writer, "Zendikar Block"); break;
-            }
-        }
-    }
-
-    static class LegalityLegalityExtensions
-    {
-        public static LegalityLegality? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "Banned": return LegalityLegality.Banned;
-                case "Legal": return LegalityLegality.Legal;
-                case "Restricted": return LegalityLegality.Restricted;
-                default: return null;
-            }
-        }
-
-        public static LegalityLegality ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this LegalityLegality value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case LegalityLegality.Banned: serializer.Serialize(writer, "Banned"); break;
-                case LegalityLegality.Legal: serializer.Serialize(writer, "Legal"); break;
-                case LegalityLegality.Restricted: serializer.Serialize(writer, "Restricted"); break;
-            }
-        }
-    }
-
-    static class RarityExtensions
-    {
-        public static Rarity? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "Basic Land": return Rarity.BasicLand;
-                case "Common": return Rarity.Common;
-                case "Rare": return Rarity.Rare;
-                case "Uncommon": return Rarity.Uncommon;
-                default: return null;
-            }
-        }
-
-        public static Rarity ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this Rarity value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case Rarity.BasicLand: serializer.Serialize(writer, "Basic Land"); break;
-                case Rarity.Common: serializer.Serialize(writer, "Common"); break;
-                case Rarity.Rare: serializer.Serialize(writer, "Rare"); break;
-                case Rarity.Uncommon: serializer.Serialize(writer, "Uncommon"); break;
-            }
-        }
-    }
-
-    static class SupertypeExtensions
-    {
-        public static Supertype? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "Basic": return Supertype.Basic;
-                default: return null;
-            }
-        }
-
-        public static Supertype ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this Supertype value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case Supertype.Basic: serializer.Serialize(writer, "Basic"); break;
-            }
-        }
-    }
-
-    static class TypeElementExtensions
-    {
-        public static TypeElement? ValueForString(string str)
-        {
-            switch (str)
-            {
-                case "Artifact": return TypeElement.Artifact;
-                case "Creature": return TypeElement.Creature;
-                case "Enchantment": return TypeElement.Enchantment;
-                case "Instant": return TypeElement.Instant;
-                case "Land": return TypeElement.Land;
-                case "Sorcery": return TypeElement.Sorcery;
-                default: return null;
-            }
-        }
-
-        public static TypeElement ReadJson(JsonReader reader, JsonSerializer serializer)
-        {
-            var str = serializer.Deserialize<string>(reader);
-            var maybeValue = ValueForString(str);
-            if (maybeValue.HasValue) return maybeValue.Value;
-            throw new Exception("Unknown enum case " + str);
-        }
-
-        public static void WriteJson(this TypeElement value, JsonWriter writer, JsonSerializer serializer)
-        {
-            switch (value)
-            {
-                case TypeElement.Artifact: serializer.Serialize(writer, "Artifact"); break;
-                case TypeElement.Creature: serializer.Serialize(writer, "Creature"); break;
-                case TypeElement.Enchantment: serializer.Serialize(writer, "Enchantment"); break;
-                case TypeElement.Instant: serializer.Serialize(writer, "Instant"); break;
-                case TypeElement.Land: serializer.Serialize(writer, "Land"); break;
-                case TypeElement.Sorcery: serializer.Serialize(writer, "Sorcery"); break;
-            }
-        }
-    }
-
     public static class Serialize
     {
         public static string ToJson(this LeaExtras self) => JsonConvert.SerializeObject(self, QuickType.Converter.Settings);
     }
 
-    internal class Converter: JsonConverter
+    internal static class Converter
     {
-        public override bool CanConvert(Type t) => t == typeof(Booster) || t == typeof(ColorIdentity) || t == typeof(Color) || t == typeof(Layout) || t == typeof(Format) || t == typeof(LegalityLegality) || t == typeof(Rarity) || t == typeof(Supertype) || t == typeof(TypeElement) || t == typeof(Booster?) || t == typeof(ColorIdentity?) || t == typeof(Color?) || t == typeof(Layout?) || t == typeof(Format?) || t == typeof(LegalityLegality?) || t == typeof(Rarity?) || t == typeof(Supertype?) || t == typeof(TypeElement?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (t == typeof(Booster))
-                return BoosterExtensions.ReadJson(reader, serializer);
-            if (t == typeof(ColorIdentity))
-                return ColorIdentityExtensions.ReadJson(reader, serializer);
-            if (t == typeof(Color))
-                return ColorExtensions.ReadJson(reader, serializer);
-            if (t == typeof(Layout))
-                return LayoutExtensions.ReadJson(reader, serializer);
-            if (t == typeof(Format))
-                return FormatExtensions.ReadJson(reader, serializer);
-            if (t == typeof(LegalityLegality))
-                return LegalityLegalityExtensions.ReadJson(reader, serializer);
-            if (t == typeof(Rarity))
-                return RarityExtensions.ReadJson(reader, serializer);
-            if (t == typeof(Supertype))
-                return SupertypeExtensions.ReadJson(reader, serializer);
-            if (t == typeof(TypeElement))
-                return TypeElementExtensions.ReadJson(reader, serializer);
-            if (t == typeof(Booster?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return BoosterExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(ColorIdentity?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return ColorIdentityExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(Color?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return ColorExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(Layout?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return LayoutExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(Format?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return FormatExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(LegalityLegality?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return LegalityLegalityExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(Rarity?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return RarityExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(Supertype?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return SupertypeExtensions.ReadJson(reader, serializer);
-            }
-            if (t == typeof(TypeElement?))
-            {
-                if (reader.TokenType == JsonToken.Null) return null;
-                return TypeElementExtensions.ReadJson(reader, serializer);
-            }
-            throw new Exception("Unknown type");
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            var t = value.GetType();
-            if (t == typeof(Booster))
-            {
-                ((Booster)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(ColorIdentity))
-            {
-                ((ColorIdentity)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(Color))
-            {
-                ((Color)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(Layout))
-            {
-                ((Layout)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(Format))
-            {
-                ((Format)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(LegalityLegality))
-            {
-                ((LegalityLegality)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(Rarity))
-            {
-                ((Rarity)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(Supertype))
-            {
-                ((Supertype)value).WriteJson(writer, serializer);
-                return;
-            }
-            if (t == typeof(TypeElement))
-            {
-                ((TypeElement)value).WriteJson(writer, serializer);
-                return;
-            }
-            throw new Exception("Unknown type");
-        }
-
         public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
             DateParseHandling = DateParseHandling.None,
-            Converters = { 
-                new Converter(),
-                new IsoDateTimeConverter()
-                {
-                    DateTimeStyles = DateTimeStyles.AssumeUniversal,
-                },
+            Converters = {
+                BoosterConverter.Singleton,
+                ColorIdentityConverter.Singleton,
+                ColorConverter.Singleton,
+                LayoutConverter.Singleton,
+                FormatConverter.Singleton,
+                LegalityEnumConverter.Singleton,
+                RarityConverter.Singleton,
+                SupertypeConverter.Singleton,
+                TypeElementConverter.Singleton,
+                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
+    }
+
+    internal class BoosterConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Booster) || t == typeof(Booster?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "common":
+                    return Booster.Common;
+                case "rare":
+                    return Booster.Rare;
+                case "uncommon":
+                    return Booster.Uncommon;
+            }
+            throw new Exception("Cannot unmarshal type Booster");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Booster)untypedValue;
+            switch (value)
+            {
+                case Booster.Common:
+                    serializer.Serialize(writer, "common");
+                    return;
+                case Booster.Rare:
+                    serializer.Serialize(writer, "rare");
+                    return;
+                case Booster.Uncommon:
+                    serializer.Serialize(writer, "uncommon");
+                    return;
+            }
+            throw new Exception("Cannot marshal type Booster");
+        }
+
+        public static readonly BoosterConverter Singleton = new BoosterConverter();
+    }
+
+    internal class ColorIdentityConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(ColorIdentity) || t == typeof(ColorIdentity?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "B":
+                    return ColorIdentity.B;
+                case "G":
+                    return ColorIdentity.G;
+                case "R":
+                    return ColorIdentity.R;
+                case "U":
+                    return ColorIdentity.U;
+                case "W":
+                    return ColorIdentity.W;
+            }
+            throw new Exception("Cannot unmarshal type ColorIdentity");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (ColorIdentity)untypedValue;
+            switch (value)
+            {
+                case ColorIdentity.B:
+                    serializer.Serialize(writer, "B");
+                    return;
+                case ColorIdentity.G:
+                    serializer.Serialize(writer, "G");
+                    return;
+                case ColorIdentity.R:
+                    serializer.Serialize(writer, "R");
+                    return;
+                case ColorIdentity.U:
+                    serializer.Serialize(writer, "U");
+                    return;
+                case ColorIdentity.W:
+                    serializer.Serialize(writer, "W");
+                    return;
+            }
+            throw new Exception("Cannot marshal type ColorIdentity");
+        }
+
+        public static readonly ColorIdentityConverter Singleton = new ColorIdentityConverter();
+    }
+
+    internal class ColorConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Color) || t == typeof(Color?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Black":
+                    return Color.Black;
+                case "Blue":
+                    return Color.Blue;
+                case "Green":
+                    return Color.Green;
+                case "Red":
+                    return Color.Red;
+                case "White":
+                    return Color.White;
+            }
+            throw new Exception("Cannot unmarshal type Color");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Color)untypedValue;
+            switch (value)
+            {
+                case Color.Black:
+                    serializer.Serialize(writer, "Black");
+                    return;
+                case Color.Blue:
+                    serializer.Serialize(writer, "Blue");
+                    return;
+                case Color.Green:
+                    serializer.Serialize(writer, "Green");
+                    return;
+                case Color.Red:
+                    serializer.Serialize(writer, "Red");
+                    return;
+                case Color.White:
+                    serializer.Serialize(writer, "White");
+                    return;
+            }
+            throw new Exception("Cannot marshal type Color");
+        }
+
+        public static readonly ColorConverter Singleton = new ColorConverter();
+    }
+
+    internal class LayoutConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Layout) || t == typeof(Layout?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "normal")
+            {
+                return Layout.Normal;
+            }
+            throw new Exception("Cannot unmarshal type Layout");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Layout)untypedValue;
+            if (value == Layout.Normal)
+            {
+                serializer.Serialize(writer, "normal");
+                return;
+            }
+            throw new Exception("Cannot marshal type Layout");
+        }
+
+        public static readonly LayoutConverter Singleton = new LayoutConverter();
+    }
+
+    internal class FormatConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Format) || t == typeof(Format?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Brawl":
+                    return Format.Brawl;
+                case "Commander":
+                    return Format.Commander;
+                case "Legacy":
+                    return Format.Legacy;
+                case "Modern":
+                    return Format.Modern;
+                case "Standard":
+                    return Format.Standard;
+                case "Vintage":
+                    return Format.Vintage;
+            }
+            throw new Exception("Cannot unmarshal type Format");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Format)untypedValue;
+            switch (value)
+            {
+                case Format.Brawl:
+                    serializer.Serialize(writer, "Brawl");
+                    return;
+                case Format.Commander:
+                    serializer.Serialize(writer, "Commander");
+                    return;
+                case Format.Legacy:
+                    serializer.Serialize(writer, "Legacy");
+                    return;
+                case Format.Modern:
+                    serializer.Serialize(writer, "Modern");
+                    return;
+                case Format.Standard:
+                    serializer.Serialize(writer, "Standard");
+                    return;
+                case Format.Vintage:
+                    serializer.Serialize(writer, "Vintage");
+                    return;
+            }
+            throw new Exception("Cannot marshal type Format");
+        }
+
+        public static readonly FormatConverter Singleton = new FormatConverter();
+    }
+
+    internal class LegalityEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(LegalityEnum) || t == typeof(LegalityEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Banned":
+                    return LegalityEnum.Banned;
+                case "Legal":
+                    return LegalityEnum.Legal;
+                case "Restricted":
+                    return LegalityEnum.Restricted;
+            }
+            throw new Exception("Cannot unmarshal type LegalityEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (LegalityEnum)untypedValue;
+            switch (value)
+            {
+                case LegalityEnum.Banned:
+                    serializer.Serialize(writer, "Banned");
+                    return;
+                case LegalityEnum.Legal:
+                    serializer.Serialize(writer, "Legal");
+                    return;
+                case LegalityEnum.Restricted:
+                    serializer.Serialize(writer, "Restricted");
+                    return;
+            }
+            throw new Exception("Cannot marshal type LegalityEnum");
+        }
+
+        public static readonly LegalityEnumConverter Singleton = new LegalityEnumConverter();
+    }
+
+    internal class ParseStringConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(long) || t == typeof(long?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            long l;
+            if (Int64.TryParse(value, out l))
+            {
+                return l;
+            }
+            throw new Exception("Cannot unmarshal type long");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (long)untypedValue;
+            serializer.Serialize(writer, value.ToString());
+            return;
+        }
+
+        public static readonly ParseStringConverter Singleton = new ParseStringConverter();
+    }
+
+    internal class RarityConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Rarity) || t == typeof(Rarity?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Basic Land":
+                    return Rarity.BasicLand;
+                case "Common":
+                    return Rarity.Common;
+                case "Rare":
+                    return Rarity.Rare;
+                case "Uncommon":
+                    return Rarity.Uncommon;
+            }
+            throw new Exception("Cannot unmarshal type Rarity");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Rarity)untypedValue;
+            switch (value)
+            {
+                case Rarity.BasicLand:
+                    serializer.Serialize(writer, "Basic Land");
+                    return;
+                case Rarity.Common:
+                    serializer.Serialize(writer, "Common");
+                    return;
+                case Rarity.Rare:
+                    serializer.Serialize(writer, "Rare");
+                    return;
+                case Rarity.Uncommon:
+                    serializer.Serialize(writer, "Uncommon");
+                    return;
+            }
+            throw new Exception("Cannot marshal type Rarity");
+        }
+
+        public static readonly RarityConverter Singleton = new RarityConverter();
+    }
+
+    internal class SupertypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Supertype) || t == typeof(Supertype?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "Basic")
+            {
+                return Supertype.Basic;
+            }
+            throw new Exception("Cannot unmarshal type Supertype");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Supertype)untypedValue;
+            if (value == Supertype.Basic)
+            {
+                serializer.Serialize(writer, "Basic");
+                return;
+            }
+            throw new Exception("Cannot marshal type Supertype");
+        }
+
+        public static readonly SupertypeConverter Singleton = new SupertypeConverter();
+    }
+
+    internal class TypeElementConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TypeElement) || t == typeof(TypeElement?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Artifact":
+                    return TypeElement.Artifact;
+                case "Creature":
+                    return TypeElement.Creature;
+                case "Enchantment":
+                    return TypeElement.Enchantment;
+                case "Instant":
+                    return TypeElement.Instant;
+                case "Land":
+                    return TypeElement.Land;
+                case "Sorcery":
+                    return TypeElement.Sorcery;
+            }
+            throw new Exception("Cannot unmarshal type TypeElement");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TypeElement)untypedValue;
+            switch (value)
+            {
+                case TypeElement.Artifact:
+                    serializer.Serialize(writer, "Artifact");
+                    return;
+                case TypeElement.Creature:
+                    serializer.Serialize(writer, "Creature");
+                    return;
+                case TypeElement.Enchantment:
+                    serializer.Serialize(writer, "Enchantment");
+                    return;
+                case TypeElement.Instant:
+                    serializer.Serialize(writer, "Instant");
+                    return;
+                case TypeElement.Land:
+                    serializer.Serialize(writer, "Land");
+                    return;
+                case TypeElement.Sorcery:
+                    serializer.Serialize(writer, "Sorcery");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TypeElement");
+        }
+
+        public static readonly TypeElementConverter Singleton = new TypeElementConverter();
     }
 }

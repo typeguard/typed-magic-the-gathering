@@ -1,5 +1,5 @@
 // To parse this JSON:
-// 
+//
 //   NSError *error;
 //   LEAExtras *extras = [LEAExtras fromJSON:json encoding:NSUTF8Encoding error:&error];
 
@@ -13,7 +13,7 @@
 @class LEALayout;
 @class LEALegalityElement;
 @class LEAFormat;
-@class LEALegalityLegality;
+@class LEALegalityEnum;
 @class LEARarity;
 @class LEARuling;
 @class LEASupertype;
@@ -60,45 +60,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface LEAFormat : NSObject
 @property (nonatomic, readonly, copy) NSString *value;
 + (instancetype _Nullable)withValue:(NSString *)value;
-+ (LEAFormat *)amonkhetBlock;
-+ (LEAFormat *)battleForZendikarBlock;
++ (LEAFormat *)brawl;
 + (LEAFormat *)commander;
-+ (LEAFormat *)iceAgeBlock;
-+ (LEAFormat *)innistradBlock;
-+ (LEAFormat *)invasionBlock;
-+ (LEAFormat *)ixalanBlock;
-+ (LEAFormat *)kaladeshBlock;
-+ (LEAFormat *)kamigawaBlock;
-+ (LEAFormat *)khansOfTarkirBlock;
 + (LEAFormat *)legacy;
-+ (LEAFormat *)lorwynShadowmoorBlock;
-+ (LEAFormat *)masquesBlock;
-+ (LEAFormat *)mirageBlock;
-+ (LEAFormat *)mirrodinBlock;
 + (LEAFormat *)modern;
-+ (LEAFormat *)odysseyBlock;
-+ (LEAFormat *)onslaughtBlock;
-+ (LEAFormat *)ravnicaBlock;
-+ (LEAFormat *)returnToRavnicaBlock;
-+ (LEAFormat *)scarsOfMirrodinBlock;
-+ (LEAFormat *)shadowsOverInnistradBlock;
-+ (LEAFormat *)shardsOfAlaraBlock;
 + (LEAFormat *)standard;
-+ (LEAFormat *)tempestBlock;
-+ (LEAFormat *)therosBlock;
-+ (LEAFormat *)timeSpiralBlock;
-+ (LEAFormat *)unSets;
-+ (LEAFormat *)urzaBlock;
 + (LEAFormat *)vintage;
-+ (LEAFormat *)zendikarBlock;
 @end
 
-@interface LEALegalityLegality : NSObject
+@interface LEALegalityEnum : NSObject
 @property (nonatomic, readonly, copy) NSString *value;
 + (instancetype _Nullable)withValue:(NSString *)value;
-+ (LEALegalityLegality *)banned;
-+ (LEALegalityLegality *)legal;
-+ (LEALegalityLegality *)restricted;
++ (LEALegalityEnum *)banned;
++ (LEALegalityEnum *)legal;
++ (LEALegalityEnum *)restricted;
 @end
 
 @interface LEARarity : NSObject
@@ -180,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LEALegalityElement : NSObject
 @property (nonatomic, assign) LEAFormat *format;
-@property (nonatomic, assign) LEALegalityLegality *legality;
+@property (nonatomic, assign) LEALegalityEnum *legality;
 @end
 
 @interface LEARuling : NSObject

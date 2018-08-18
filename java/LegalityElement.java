@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.*;
 
 public class LegalityElement {
     private Format format;
-    private LegalityLegality legality;
+    private LegalityEnum legality;
 
     @JsonProperty("format")
     public Format getFormat() { return format; }
@@ -13,7 +13,7 @@ public class LegalityElement {
     public void setFormat(Format value) { this.format = value; }
 
     @JsonProperty("legality")
-    public LegalityLegality getLegality() { return legality; }
+    public LegalityEnum getLegality() { return legality; }
     @JsonProperty("legality")
-    public void setLegality(LegalityLegality value) { this.legality = value; }
+    public void setLegality(LegalityEnum value) { this.legality = value; }
 }

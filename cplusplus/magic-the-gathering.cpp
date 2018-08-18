@@ -1,76 +1,242 @@
 //  To parse this JSON data, first install
-// 
+//
 //      Boost     http://www.boost.org
 //      json.hpp  https://github.com/nlohmann/json
-// 
+//
 //  Then include this file, and then do
-// 
+//
 //     LeaExtras data = nlohmann::json::parse(jsonString);
 
+#pragma once
+
 #include "json.hpp"
+
+#include <boost/optional.hpp>
+#include <stdexcept>
+#include <regex>
+namespace nlohmann {
+    template <typename T>
+    struct adl_serializer<std::shared_ptr<T>> {
+        static void to_json(json& j, const std::shared_ptr<T>& opt) {
+            if (!opt) j = nullptr; else j = *opt;
+        }
+
+        static std::shared_ptr<T> from_json(const json& j) {
+            if (j.is_null()) return std::unique_ptr<T>(); else return std::unique_ptr<T>(new T(j.get<T>()));
+        }
+    };
+}
 
 namespace quicktype {
     using nlohmann::json;
 
-    enum class Booster { COMMON, RARE, UNCOMMON };
+    inline json get_untyped(const json &j, const char *property) {
+        if (j.find(property) != j.end()) {
+            return j.at(property).get<json>();
+        }
+        return json();
+    }
 
-    enum class ColorIdentity { B, G, R, U, W };
+    template <typename T>
+    inline std::shared_ptr<T> get_optional(const json &j, const char *property) {
+        if (j.find(property) != j.end()) {
+            return j.at(property).get<std::shared_ptr<T>>();
+        }
+        return std::shared_ptr<T>();
+    }
 
-    enum class Color { BLACK, BLUE, GREEN, RED, WHITE };
+    enum class Booster : int { COMMON, RARE, UNCOMMON };
 
-    enum class Layout { NORMAL };
+    enum class ColorIdentity : int { B, G, R, U, W };
 
-    enum class Format { AMONKHET_BLOCK, BATTLE_FOR_ZENDIKAR_BLOCK, COMMANDER, ICE_AGE_BLOCK, INNISTRAD_BLOCK, INVASION_BLOCK, IXALAN_BLOCK, KALADESH_BLOCK, KAMIGAWA_BLOCK, KHANS_OF_TARKIR_BLOCK, LEGACY, LORWYN_SHADOWMOOR_BLOCK, MASQUES_BLOCK, MIRAGE_BLOCK, MIRRODIN_BLOCK, MODERN, ODYSSEY_BLOCK, ONSLAUGHT_BLOCK, RAVNICA_BLOCK, RETURN_TO_RAVNICA_BLOCK, SCARS_OF_MIRRODIN_BLOCK, SHADOWS_OVER_INNISTRAD_BLOCK, SHARDS_OF_ALARA_BLOCK, STANDARD, TEMPEST_BLOCK, THEROS_BLOCK, TIME_SPIRAL_BLOCK, UN_SETS, URZA_BLOCK, VINTAGE, ZENDIKAR_BLOCK };
+    enum class Color : int { BLACK, BLUE, GREEN, RED, WHITE };
 
-    enum class LegalityLegality { BANNED, LEGAL, RESTRICTED };
+    enum class Layout : int { NORMAL };
 
-    struct LegalityElement {
+    enum class Format : int { BRAWL, COMMANDER, LEGACY, MODERN, STANDARD, VINTAGE };
+
+    enum class LegalityEnum : int { BANNED, LEGAL, RESTRICTED };
+
+    class LegalityElement {
+        public:
+        LegalityElement() = default;
+        virtual ~LegalityElement() = default;
+
+        private:
         Format format;
-        LegalityLegality legality;
+        LegalityEnum legality;
+
+        public:
+        const Format & get_format() const { return format; }
+        Format & get_mutable_format() { return format; }
+        void set_format(const Format& value) { this->format = value; }
+
+        const LegalityEnum & get_legality() const { return legality; }
+        LegalityEnum & get_mutable_legality() { return legality; }
+        void set_legality(const LegalityEnum& value) { this->legality = value; }
     };
 
-    enum class Rarity { BASIC_LAND, COMMON, RARE, UNCOMMON };
+    enum class Rarity : int { BASIC_LAND, COMMON, RARE, UNCOMMON };
 
-    struct Ruling {
+    class Ruling {
+        public:
+        Ruling() = default;
+        virtual ~Ruling() = default;
+
+        private:
         std::string date;
         std::string text;
+
+        public:
+        const std::string & get_date() const { return date; }
+        std::string & get_mutable_date() { return date; }
+        void set_date(const std::string& value) { this->date = value; }
+
+        const std::string & get_text() const { return text; }
+        std::string & get_mutable_text() { return text; }
+        void set_text(const std::string& value) { this->text = value; }
     };
 
-    enum class Supertype { BASIC };
+    enum class Supertype : int { BASIC };
 
-    enum class Type { ARTIFACT, CREATURE, ENCHANTMENT, INSTANT, LAND, SORCERY };
+    enum class Type : int { ARTIFACT, CREATURE, ENCHANTMENT, INSTANT, LAND, SORCERY };
 
-    struct Card {
+    class Card {
+        public:
+        Card() = default;
+        virtual ~Card() = default;
+
+        private:
         std::string artist;
         int64_t cmc;
         std::string id;
         std::string image_name;
         Layout layout;
-        std::vector<struct LegalityElement> legalities;
-        std::unique_ptr<std::string> mana_cost;
-        std::unique_ptr<std::string> mci_number;
+        std::vector<LegalityElement> legalities;
+        std::shared_ptr<std::string> mana_cost;
+        std::shared_ptr<std::string> mci_number;
         int64_t multiverseid;
         std::string name;
-        std::unique_ptr<std::string> original_text;
+        std::shared_ptr<std::string> original_text;
         std::string original_type;
         std::vector<std::string> printings;
         Rarity rarity;
-        std::unique_ptr<std::vector<struct Ruling>> rulings;
-        std::unique_ptr<std::string> text;
+        std::shared_ptr<std::vector<Ruling>> rulings;
+        std::shared_ptr<std::string> text;
         std::string type;
         std::vector<Type> types;
-        std::unique_ptr<bool> reserved;
-        std::unique_ptr<std::string> power;
-        std::unique_ptr<std::vector<std::string>> subtypes;
-        std::unique_ptr<std::string> toughness;
-        std::unique_ptr<std::vector<ColorIdentity>> color_identity;
-        std::unique_ptr<std::string> flavor;
-        std::unique_ptr<std::vector<Color>> colors;
-        std::unique_ptr<std::vector<Supertype>> supertypes;
-        std::unique_ptr<std::vector<int64_t>> variations;
+        std::shared_ptr<bool> reserved;
+        std::shared_ptr<std::string> power;
+        std::shared_ptr<std::vector<std::string>> subtypes;
+        std::shared_ptr<std::string> toughness;
+        std::shared_ptr<std::vector<ColorIdentity>> color_identity;
+        std::shared_ptr<std::string> flavor;
+        std::shared_ptr<std::vector<Color>> colors;
+        std::shared_ptr<std::vector<Supertype>> supertypes;
+        std::shared_ptr<std::vector<int64_t>> variations;
+
+        public:
+        const std::string & get_artist() const { return artist; }
+        std::string & get_mutable_artist() { return artist; }
+        void set_artist(const std::string& value) { this->artist = value; }
+
+        const int64_t & get_cmc() const { return cmc; }
+        int64_t & get_mutable_cmc() { return cmc; }
+        void set_cmc(const int64_t& value) { this->cmc = value; }
+
+        const std::string & get_id() const { return id; }
+        std::string & get_mutable_id() { return id; }
+        void set_id(const std::string& value) { this->id = value; }
+
+        const std::string & get_image_name() const { return image_name; }
+        std::string & get_mutable_image_name() { return image_name; }
+        void set_image_name(const std::string& value) { this->image_name = value; }
+
+        const Layout & get_layout() const { return layout; }
+        Layout & get_mutable_layout() { return layout; }
+        void set_layout(const Layout& value) { this->layout = value; }
+
+        const std::vector<LegalityElement> & get_legalities() const { return legalities; }
+        std::vector<LegalityElement> & get_mutable_legalities() { return legalities; }
+        void set_legalities(const std::vector<LegalityElement>& value) { this->legalities = value; }
+
+        std::shared_ptr<std::string> get_mana_cost() const { return mana_cost; }
+        void set_mana_cost(std::shared_ptr<std::string> value) { this->mana_cost = value; }
+
+        std::shared_ptr<std::string> get_mci_number() const { return mci_number; }
+        void set_mci_number(std::shared_ptr<std::string> value) { this->mci_number = value; }
+
+        const int64_t & get_multiverseid() const { return multiverseid; }
+        int64_t & get_mutable_multiverseid() { return multiverseid; }
+        void set_multiverseid(const int64_t& value) { this->multiverseid = value; }
+
+        const std::string & get_name() const { return name; }
+        std::string & get_mutable_name() { return name; }
+        void set_name(const std::string& value) { this->name = value; }
+
+        std::shared_ptr<std::string> get_original_text() const { return original_text; }
+        void set_original_text(std::shared_ptr<std::string> value) { this->original_text = value; }
+
+        const std::string & get_original_type() const { return original_type; }
+        std::string & get_mutable_original_type() { return original_type; }
+        void set_original_type(const std::string& value) { this->original_type = value; }
+
+        const std::vector<std::string> & get_printings() const { return printings; }
+        std::vector<std::string> & get_mutable_printings() { return printings; }
+        void set_printings(const std::vector<std::string>& value) { this->printings = value; }
+
+        const Rarity & get_rarity() const { return rarity; }
+        Rarity & get_mutable_rarity() { return rarity; }
+        void set_rarity(const Rarity& value) { this->rarity = value; }
+
+        std::shared_ptr<std::vector<Ruling>> get_rulings() const { return rulings; }
+        void set_rulings(std::shared_ptr<std::vector<Ruling>> value) { this->rulings = value; }
+
+        std::shared_ptr<std::string> get_text() const { return text; }
+        void set_text(std::shared_ptr<std::string> value) { this->text = value; }
+
+        const std::string & get_type() const { return type; }
+        std::string & get_mutable_type() { return type; }
+        void set_type(const std::string& value) { this->type = value; }
+
+        const std::vector<Type> & get_types() const { return types; }
+        std::vector<Type> & get_mutable_types() { return types; }
+        void set_types(const std::vector<Type>& value) { this->types = value; }
+
+        std::shared_ptr<bool> get_reserved() const { return reserved; }
+        void set_reserved(std::shared_ptr<bool> value) { this->reserved = value; }
+
+        std::shared_ptr<std::string> get_power() const { return power; }
+        void set_power(std::shared_ptr<std::string> value) { this->power = value; }
+
+        std::shared_ptr<std::vector<std::string>> get_subtypes() const { return subtypes; }
+        void set_subtypes(std::shared_ptr<std::vector<std::string>> value) { this->subtypes = value; }
+
+        std::shared_ptr<std::string> get_toughness() const { return toughness; }
+        void set_toughness(std::shared_ptr<std::string> value) { this->toughness = value; }
+
+        std::shared_ptr<std::vector<ColorIdentity>> get_color_identity() const { return color_identity; }
+        void set_color_identity(std::shared_ptr<std::vector<ColorIdentity>> value) { this->color_identity = value; }
+
+        std::shared_ptr<std::string> get_flavor() const { return flavor; }
+        void set_flavor(std::shared_ptr<std::string> value) { this->flavor = value; }
+
+        std::shared_ptr<std::vector<Color>> get_colors() const { return colors; }
+        void set_colors(std::shared_ptr<std::vector<Color>> value) { this->colors = value; }
+
+        std::shared_ptr<std::vector<Supertype>> get_supertypes() const { return supertypes; }
+        void set_supertypes(std::shared_ptr<std::vector<Supertype>> value) { this->supertypes = value; }
+
+        std::shared_ptr<std::vector<int64_t>> get_variations() const { return variations; }
+        void set_variations(std::shared_ptr<std::vector<int64_t>> value) { this->variations = value; }
     };
 
-    struct LeaExtras {
+    class LeaExtras {
+        public:
+        LeaExtras() = default;
+        virtual ~LeaExtras() = default;
+
+        private:
         std::string name;
         std::string code;
         std::string gatherer_code;
@@ -81,152 +247,166 @@ namespace quicktype {
         std::vector<Booster> booster;
         std::string mkm_name;
         int64_t mkm_id;
-        std::vector<struct Card> cards;
+        std::vector<Card> cards;
+
+        public:
+        const std::string & get_name() const { return name; }
+        std::string & get_mutable_name() { return name; }
+        void set_name(const std::string& value) { this->name = value; }
+
+        const std::string & get_code() const { return code; }
+        std::string & get_mutable_code() { return code; }
+        void set_code(const std::string& value) { this->code = value; }
+
+        const std::string & get_gatherer_code() const { return gatherer_code; }
+        std::string & get_mutable_gatherer_code() { return gatherer_code; }
+        void set_gatherer_code(const std::string& value) { this->gatherer_code = value; }
+
+        const std::string & get_magic_cards_info_code() const { return magic_cards_info_code; }
+        std::string & get_mutable_magic_cards_info_code() { return magic_cards_info_code; }
+        void set_magic_cards_info_code(const std::string& value) { this->magic_cards_info_code = value; }
+
+        const std::string & get_release_date() const { return release_date; }
+        std::string & get_mutable_release_date() { return release_date; }
+        void set_release_date(const std::string& value) { this->release_date = value; }
+
+        const std::string & get_border() const { return border; }
+        std::string & get_mutable_border() { return border; }
+        void set_border(const std::string& value) { this->border = value; }
+
+        const std::string & get_type() const { return type; }
+        std::string & get_mutable_type() { return type; }
+        void set_type(const std::string& value) { this->type = value; }
+
+        const std::vector<Booster> & get_booster() const { return booster; }
+        std::vector<Booster> & get_mutable_booster() { return booster; }
+        void set_booster(const std::vector<Booster>& value) { this->booster = value; }
+
+        const std::string & get_mkm_name() const { return mkm_name; }
+        std::string & get_mutable_mkm_name() { return mkm_name; }
+        void set_mkm_name(const std::string& value) { this->mkm_name = value; }
+
+        const int64_t & get_mkm_id() const { return mkm_id; }
+        int64_t & get_mutable_mkm_id() { return mkm_id; }
+        void set_mkm_id(const int64_t& value) { this->mkm_id = value; }
+
+        const std::vector<Card> & get_cards() const { return cards; }
+        std::vector<Card> & get_mutable_cards() { return cards; }
+        void set_cards(const std::vector<Card>& value) { this->cards = value; }
     };
-    
-    inline json get_untyped(const json &j, const char *property) {
-        if (j.find(property) != j.end()) {
-            return j.at(property).get<json>();
-        }
-        return json();
-    }
-    
-    template <typename T>
-    inline std::unique_ptr<T> get_optional(const json &j, const char *property) {
-        if (j.find(property) != j.end())
-            return j.at(property).get<std::unique_ptr<T>>();
-        return std::unique_ptr<T>();
-    }
 }
 
 namespace nlohmann {
-    template <typename T>
-    struct adl_serializer<std::unique_ptr<T>> {
-        static void to_json(json& j, const std::unique_ptr<T>& opt) {
-            if (!opt)
-                j = nullptr;
-            else
-                j = *opt;
-        }
-
-        static std::unique_ptr<T> from_json(const json& j) {
-            if (j.is_null())
-                return std::unique_ptr<T>();
-            else
-                return std::unique_ptr<T>(new T(j.get<T>()));
-        }
-    };
-
-    inline void from_json(const json& _j, struct quicktype::LegalityElement& _x) {
-        _x.format = _j.at("format").get<quicktype::Format>();
-        _x.legality = _j.at("legality").get<quicktype::LegalityLegality>();
+    inline void from_json(const json& _j, quicktype::LegalityElement& _x) {
+        _x.set_format( _j.at("format").get<quicktype::Format>() );
+        _x.set_legality( _j.at("legality").get<quicktype::LegalityEnum>() );
     }
 
-    inline void to_json(json& _j, const struct quicktype::LegalityElement& _x) {
+    inline void to_json(json& _j, const quicktype::LegalityElement& _x) {
         _j = json::object();
-        _j["format"] = _x.format;
-        _j["legality"] = _x.legality;
+        _j["format"] = _x.get_format();
+        _j["legality"] = _x.get_legality();
     }
 
-    inline void from_json(const json& _j, struct quicktype::Ruling& _x) {
-        _x.date = _j.at("date").get<std::string>();
-        _x.text = _j.at("text").get<std::string>();
+    inline void from_json(const json& _j, quicktype::Ruling& _x) {
+        _x.set_date( _j.at("date").get<std::string>() );
+        _x.set_text( _j.at("text").get<std::string>() );
     }
 
-    inline void to_json(json& _j, const struct quicktype::Ruling& _x) {
+    inline void to_json(json& _j, const quicktype::Ruling& _x) {
         _j = json::object();
-        _j["date"] = _x.date;
-        _j["text"] = _x.text;
+        _j["date"] = _x.get_date();
+        _j["text"] = _x.get_text();
     }
 
-    inline void from_json(const json& _j, struct quicktype::Card& _x) {
-        _x.artist = _j.at("artist").get<std::string>();
-        _x.cmc = _j.at("cmc").get<int64_t>();
-        _x.id = _j.at("id").get<std::string>();
-        _x.image_name = _j.at("imageName").get<std::string>();
-        _x.layout = _j.at("layout").get<quicktype::Layout>();
-        _x.legalities = _j.at("legalities").get<std::vector<struct quicktype::LegalityElement>>();
-        _x.mana_cost = quicktype::get_optional<std::string>(_j, "manaCost");
-        _x.mci_number = quicktype::get_optional<std::string>(_j, "mciNumber");
-        _x.multiverseid = _j.at("multiverseid").get<int64_t>();
-        _x.name = _j.at("name").get<std::string>();
-        _x.original_text = quicktype::get_optional<std::string>(_j, "originalText");
-        _x.original_type = _j.at("originalType").get<std::string>();
-        _x.printings = _j.at("printings").get<std::vector<std::string>>();
-        _x.rarity = _j.at("rarity").get<quicktype::Rarity>();
-        _x.rulings = quicktype::get_optional<std::vector<struct quicktype::Ruling>>(_j, "rulings");
-        _x.text = quicktype::get_optional<std::string>(_j, "text");
-        _x.type = _j.at("type").get<std::string>();
-        _x.types = _j.at("types").get<std::vector<quicktype::Type>>();
-        _x.reserved = quicktype::get_optional<bool>(_j, "reserved");
-        _x.power = quicktype::get_optional<std::string>(_j, "power");
-        _x.subtypes = quicktype::get_optional<std::vector<std::string>>(_j, "subtypes");
-        _x.toughness = quicktype::get_optional<std::string>(_j, "toughness");
-        _x.color_identity = quicktype::get_optional<std::vector<quicktype::ColorIdentity>>(_j, "colorIdentity");
-        _x.flavor = quicktype::get_optional<std::string>(_j, "flavor");
-        _x.colors = quicktype::get_optional<std::vector<quicktype::Color>>(_j, "colors");
-        _x.supertypes = quicktype::get_optional<std::vector<quicktype::Supertype>>(_j, "supertypes");
-        _x.variations = quicktype::get_optional<std::vector<int64_t>>(_j, "variations");
+    inline void from_json(const json& _j, quicktype::Card& _x) {
+        _x.set_artist( _j.at("artist").get<std::string>() );
+        _x.set_cmc( _j.at("cmc").get<int64_t>() );
+        _x.set_id( _j.at("id").get<std::string>() );
+        _x.set_image_name( _j.at("imageName").get<std::string>() );
+        _x.set_layout( _j.at("layout").get<quicktype::Layout>() );
+        _x.set_legalities( _j.at("legalities").get<std::vector<quicktype::LegalityElement>>() );
+        _x.set_mana_cost( quicktype::get_optional<std::string>(_j, "manaCost") );
+        _x.set_mci_number( quicktype::get_optional<std::string>(_j, "mciNumber") );
+        _x.set_multiverseid( _j.at("multiverseid").get<int64_t>() );
+        _x.set_name( _j.at("name").get<std::string>() );
+        _x.set_original_text( quicktype::get_optional<std::string>(_j, "originalText") );
+        _x.set_original_type( _j.at("originalType").get<std::string>() );
+        _x.set_printings( _j.at("printings").get<std::vector<std::string>>() );
+        _x.set_rarity( _j.at("rarity").get<quicktype::Rarity>() );
+        _x.set_rulings( quicktype::get_optional<std::vector<quicktype::Ruling>>(_j, "rulings") );
+        _x.set_text( quicktype::get_optional<std::string>(_j, "text") );
+        _x.set_type( _j.at("type").get<std::string>() );
+        _x.set_types( _j.at("types").get<std::vector<quicktype::Type>>() );
+        _x.set_reserved( quicktype::get_optional<bool>(_j, "reserved") );
+        _x.set_power( quicktype::get_optional<std::string>(_j, "power") );
+        _x.set_subtypes( quicktype::get_optional<std::vector<std::string>>(_j, "subtypes") );
+        _x.set_toughness( quicktype::get_optional<std::string>(_j, "toughness") );
+        _x.set_color_identity( quicktype::get_optional<std::vector<quicktype::ColorIdentity>>(_j, "colorIdentity") );
+        _x.set_flavor( quicktype::get_optional<std::string>(_j, "flavor") );
+        _x.set_colors( quicktype::get_optional<std::vector<quicktype::Color>>(_j, "colors") );
+        _x.set_supertypes( quicktype::get_optional<std::vector<quicktype::Supertype>>(_j, "supertypes") );
+        _x.set_variations( quicktype::get_optional<std::vector<int64_t>>(_j, "variations") );
     }
 
-    inline void to_json(json& _j, const struct quicktype::Card& _x) {
+    inline void to_json(json& _j, const quicktype::Card& _x) {
         _j = json::object();
-        _j["artist"] = _x.artist;
-        _j["cmc"] = _x.cmc;
-        _j["id"] = _x.id;
-        _j["imageName"] = _x.image_name;
-        _j["layout"] = _x.layout;
-        _j["legalities"] = _x.legalities;
-        _j["manaCost"] = _x.mana_cost;
-        _j["mciNumber"] = _x.mci_number;
-        _j["multiverseid"] = _x.multiverseid;
-        _j["name"] = _x.name;
-        _j["originalText"] = _x.original_text;
-        _j["originalType"] = _x.original_type;
-        _j["printings"] = _x.printings;
-        _j["rarity"] = _x.rarity;
-        _j["rulings"] = _x.rulings;
-        _j["text"] = _x.text;
-        _j["type"] = _x.type;
-        _j["types"] = _x.types;
-        _j["reserved"] = _x.reserved;
-        _j["power"] = _x.power;
-        _j["subtypes"] = _x.subtypes;
-        _j["toughness"] = _x.toughness;
-        _j["colorIdentity"] = _x.color_identity;
-        _j["flavor"] = _x.flavor;
-        _j["colors"] = _x.colors;
-        _j["supertypes"] = _x.supertypes;
-        _j["variations"] = _x.variations;
+        _j["artist"] = _x.get_artist();
+        _j["cmc"] = _x.get_cmc();
+        _j["id"] = _x.get_id();
+        _j["imageName"] = _x.get_image_name();
+        _j["layout"] = _x.get_layout();
+        _j["legalities"] = _x.get_legalities();
+        _j["manaCost"] = _x.get_mana_cost();
+        _j["mciNumber"] = _x.get_mci_number();
+        _j["multiverseid"] = _x.get_multiverseid();
+        _j["name"] = _x.get_name();
+        _j["originalText"] = _x.get_original_text();
+        _j["originalType"] = _x.get_original_type();
+        _j["printings"] = _x.get_printings();
+        _j["rarity"] = _x.get_rarity();
+        _j["rulings"] = _x.get_rulings();
+        _j["text"] = _x.get_text();
+        _j["type"] = _x.get_type();
+        _j["types"] = _x.get_types();
+        _j["reserved"] = _x.get_reserved();
+        _j["power"] = _x.get_power();
+        _j["subtypes"] = _x.get_subtypes();
+        _j["toughness"] = _x.get_toughness();
+        _j["colorIdentity"] = _x.get_color_identity();
+        _j["flavor"] = _x.get_flavor();
+        _j["colors"] = _x.get_colors();
+        _j["supertypes"] = _x.get_supertypes();
+        _j["variations"] = _x.get_variations();
     }
 
-    inline void from_json(const json& _j, struct quicktype::LeaExtras& _x) {
-        _x.name = _j.at("name").get<std::string>();
-        _x.code = _j.at("code").get<std::string>();
-        _x.gatherer_code = _j.at("gathererCode").get<std::string>();
-        _x.magic_cards_info_code = _j.at("magicCardsInfoCode").get<std::string>();
-        _x.release_date = _j.at("releaseDate").get<std::string>();
-        _x.border = _j.at("border").get<std::string>();
-        _x.type = _j.at("type").get<std::string>();
-        _x.booster = _j.at("booster").get<std::vector<quicktype::Booster>>();
-        _x.mkm_name = _j.at("mkm_name").get<std::string>();
-        _x.mkm_id = _j.at("mkm_id").get<int64_t>();
-        _x.cards = _j.at("cards").get<std::vector<struct quicktype::Card>>();
+    inline void from_json(const json& _j, quicktype::LeaExtras& _x) {
+        _x.set_name( _j.at("name").get<std::string>() );
+        _x.set_code( _j.at("code").get<std::string>() );
+        _x.set_gatherer_code( _j.at("gathererCode").get<std::string>() );
+        _x.set_magic_cards_info_code( _j.at("magicCardsInfoCode").get<std::string>() );
+        _x.set_release_date( _j.at("releaseDate").get<std::string>() );
+        _x.set_border( _j.at("border").get<std::string>() );
+        _x.set_type( _j.at("type").get<std::string>() );
+        _x.set_booster( _j.at("booster").get<std::vector<quicktype::Booster>>() );
+        _x.set_mkm_name( _j.at("mkm_name").get<std::string>() );
+        _x.set_mkm_id( _j.at("mkm_id").get<int64_t>() );
+        _x.set_cards( _j.at("cards").get<std::vector<quicktype::Card>>() );
     }
 
-    inline void to_json(json& _j, const struct quicktype::LeaExtras& _x) {
+    inline void to_json(json& _j, const quicktype::LeaExtras& _x) {
         _j = json::object();
-        _j["name"] = _x.name;
-        _j["code"] = _x.code;
-        _j["gathererCode"] = _x.gatherer_code;
-        _j["magicCardsInfoCode"] = _x.magic_cards_info_code;
-        _j["releaseDate"] = _x.release_date;
-        _j["border"] = _x.border;
-        _j["type"] = _x.type;
-        _j["booster"] = _x.booster;
-        _j["mkm_name"] = _x.mkm_name;
-        _j["mkm_id"] = _x.mkm_id;
-        _j["cards"] = _x.cards;
+        _j["name"] = _x.get_name();
+        _j["code"] = _x.get_code();
+        _j["gathererCode"] = _x.get_gatherer_code();
+        _j["magicCardsInfoCode"] = _x.get_magic_cards_info_code();
+        _j["releaseDate"] = _x.get_release_date();
+        _j["border"] = _x.get_border();
+        _j["type"] = _x.get_type();
+        _j["booster"] = _x.get_booster();
+        _j["mkm_name"] = _x.get_mkm_name();
+        _j["mkm_id"] = _x.get_mkm_id();
+        _j["cards"] = _x.get_cards();
     }
 
     inline void from_json(const json& _j, quicktype::Booster& _x) {
@@ -298,89 +478,39 @@ namespace nlohmann {
     }
 
     inline void from_json(const json& _j, quicktype::Format& _x) {
-        if (_j == "Amonkhet Block") _x = quicktype::Format::AMONKHET_BLOCK;
-        else if (_j == "Battle for Zendikar Block") _x = quicktype::Format::BATTLE_FOR_ZENDIKAR_BLOCK;
+        if (_j == "Brawl") _x = quicktype::Format::BRAWL;
         else if (_j == "Commander") _x = quicktype::Format::COMMANDER;
-        else if (_j == "Ice Age Block") _x = quicktype::Format::ICE_AGE_BLOCK;
-        else if (_j == "Innistrad Block") _x = quicktype::Format::INNISTRAD_BLOCK;
-        else if (_j == "Invasion Block") _x = quicktype::Format::INVASION_BLOCK;
-        else if (_j == "Ixalan Block") _x = quicktype::Format::IXALAN_BLOCK;
-        else if (_j == "Kaladesh Block") _x = quicktype::Format::KALADESH_BLOCK;
-        else if (_j == "Kamigawa Block") _x = quicktype::Format::KAMIGAWA_BLOCK;
-        else if (_j == "Khans of Tarkir Block") _x = quicktype::Format::KHANS_OF_TARKIR_BLOCK;
         else if (_j == "Legacy") _x = quicktype::Format::LEGACY;
-        else if (_j == "Lorwyn-Shadowmoor Block") _x = quicktype::Format::LORWYN_SHADOWMOOR_BLOCK;
-        else if (_j == "Masques Block") _x = quicktype::Format::MASQUES_BLOCK;
-        else if (_j == "Mirage Block") _x = quicktype::Format::MIRAGE_BLOCK;
-        else if (_j == "Mirrodin Block") _x = quicktype::Format::MIRRODIN_BLOCK;
         else if (_j == "Modern") _x = quicktype::Format::MODERN;
-        else if (_j == "Odyssey Block") _x = quicktype::Format::ODYSSEY_BLOCK;
-        else if (_j == "Onslaught Block") _x = quicktype::Format::ONSLAUGHT_BLOCK;
-        else if (_j == "Ravnica Block") _x = quicktype::Format::RAVNICA_BLOCK;
-        else if (_j == "Return to Ravnica Block") _x = quicktype::Format::RETURN_TO_RAVNICA_BLOCK;
-        else if (_j == "Scars of Mirrodin Block") _x = quicktype::Format::SCARS_OF_MIRRODIN_BLOCK;
-        else if (_j == "Shadows over Innistrad Block") _x = quicktype::Format::SHADOWS_OVER_INNISTRAD_BLOCK;
-        else if (_j == "Shards of Alara Block") _x = quicktype::Format::SHARDS_OF_ALARA_BLOCK;
         else if (_j == "Standard") _x = quicktype::Format::STANDARD;
-        else if (_j == "Tempest Block") _x = quicktype::Format::TEMPEST_BLOCK;
-        else if (_j == "Theros Block") _x = quicktype::Format::THEROS_BLOCK;
-        else if (_j == "Time Spiral Block") _x = quicktype::Format::TIME_SPIRAL_BLOCK;
-        else if (_j == "Un-Sets") _x = quicktype::Format::UN_SETS;
-        else if (_j == "Urza Block") _x = quicktype::Format::URZA_BLOCK;
         else if (_j == "Vintage") _x = quicktype::Format::VINTAGE;
-        else if (_j == "Zendikar Block") _x = quicktype::Format::ZENDIKAR_BLOCK;
         else throw "Input JSON does not conform to schema";
     }
 
     inline void to_json(json& _j, const quicktype::Format& _x) {
         switch (_x) {
-            case quicktype::Format::AMONKHET_BLOCK: _j = "Amonkhet Block"; break;
-            case quicktype::Format::BATTLE_FOR_ZENDIKAR_BLOCK: _j = "Battle for Zendikar Block"; break;
+            case quicktype::Format::BRAWL: _j = "Brawl"; break;
             case quicktype::Format::COMMANDER: _j = "Commander"; break;
-            case quicktype::Format::ICE_AGE_BLOCK: _j = "Ice Age Block"; break;
-            case quicktype::Format::INNISTRAD_BLOCK: _j = "Innistrad Block"; break;
-            case quicktype::Format::INVASION_BLOCK: _j = "Invasion Block"; break;
-            case quicktype::Format::IXALAN_BLOCK: _j = "Ixalan Block"; break;
-            case quicktype::Format::KALADESH_BLOCK: _j = "Kaladesh Block"; break;
-            case quicktype::Format::KAMIGAWA_BLOCK: _j = "Kamigawa Block"; break;
-            case quicktype::Format::KHANS_OF_TARKIR_BLOCK: _j = "Khans of Tarkir Block"; break;
             case quicktype::Format::LEGACY: _j = "Legacy"; break;
-            case quicktype::Format::LORWYN_SHADOWMOOR_BLOCK: _j = "Lorwyn-Shadowmoor Block"; break;
-            case quicktype::Format::MASQUES_BLOCK: _j = "Masques Block"; break;
-            case quicktype::Format::MIRAGE_BLOCK: _j = "Mirage Block"; break;
-            case quicktype::Format::MIRRODIN_BLOCK: _j = "Mirrodin Block"; break;
             case quicktype::Format::MODERN: _j = "Modern"; break;
-            case quicktype::Format::ODYSSEY_BLOCK: _j = "Odyssey Block"; break;
-            case quicktype::Format::ONSLAUGHT_BLOCK: _j = "Onslaught Block"; break;
-            case quicktype::Format::RAVNICA_BLOCK: _j = "Ravnica Block"; break;
-            case quicktype::Format::RETURN_TO_RAVNICA_BLOCK: _j = "Return to Ravnica Block"; break;
-            case quicktype::Format::SCARS_OF_MIRRODIN_BLOCK: _j = "Scars of Mirrodin Block"; break;
-            case quicktype::Format::SHADOWS_OVER_INNISTRAD_BLOCK: _j = "Shadows over Innistrad Block"; break;
-            case quicktype::Format::SHARDS_OF_ALARA_BLOCK: _j = "Shards of Alara Block"; break;
             case quicktype::Format::STANDARD: _j = "Standard"; break;
-            case quicktype::Format::TEMPEST_BLOCK: _j = "Tempest Block"; break;
-            case quicktype::Format::THEROS_BLOCK: _j = "Theros Block"; break;
-            case quicktype::Format::TIME_SPIRAL_BLOCK: _j = "Time Spiral Block"; break;
-            case quicktype::Format::UN_SETS: _j = "Un-Sets"; break;
-            case quicktype::Format::URZA_BLOCK: _j = "Urza Block"; break;
             case quicktype::Format::VINTAGE: _j = "Vintage"; break;
-            case quicktype::Format::ZENDIKAR_BLOCK: _j = "Zendikar Block"; break;
             default: throw "This should not happen";
         }
     }
 
-    inline void from_json(const json& _j, quicktype::LegalityLegality& _x) {
-        if (_j == "Banned") _x = quicktype::LegalityLegality::BANNED;
-        else if (_j == "Legal") _x = quicktype::LegalityLegality::LEGAL;
-        else if (_j == "Restricted") _x = quicktype::LegalityLegality::RESTRICTED;
+    inline void from_json(const json& _j, quicktype::LegalityEnum& _x) {
+        if (_j == "Banned") _x = quicktype::LegalityEnum::BANNED;
+        else if (_j == "Legal") _x = quicktype::LegalityEnum::LEGAL;
+        else if (_j == "Restricted") _x = quicktype::LegalityEnum::RESTRICTED;
         else throw "Input JSON does not conform to schema";
     }
 
-    inline void to_json(json& _j, const quicktype::LegalityLegality& _x) {
+    inline void to_json(json& _j, const quicktype::LegalityEnum& _x) {
         switch (_x) {
-            case quicktype::LegalityLegality::BANNED: _j = "Banned"; break;
-            case quicktype::LegalityLegality::LEGAL: _j = "Legal"; break;
-            case quicktype::LegalityLegality::RESTRICTED: _j = "Restricted"; break;
+            case quicktype::LegalityEnum::BANNED: _j = "Banned"; break;
+            case quicktype::LegalityEnum::LEGAL: _j = "Legal"; break;
+            case quicktype::LegalityEnum::RESTRICTED: _j = "Restricted"; break;
             default: throw "This should not happen";
         }
     }
